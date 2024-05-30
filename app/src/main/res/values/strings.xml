@@ -2,4 +2,6 @@
     <string name="app_name">Rentron</string>
     <string name="register">New account? Register</string>
     <string name="sign_in">Sign in</string>
+    <string name="username">Username:</string>
+    <string name="password">Password:</string>
 </resources>

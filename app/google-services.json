@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "241638975656",
+    "project_id": "rentron-14795",
+    "storage_bucket": "rentron-14795.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241638975656:android:c95bed22c6c1ef2ec73a9d",
+        "android_client_info": {
+          "package_name": "ca.uottawa.team3.rentron"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKM6cOHTWN0IJTyodwrEOwRIib46ryGTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

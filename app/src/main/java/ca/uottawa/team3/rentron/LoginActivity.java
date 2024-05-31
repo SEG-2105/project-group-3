@@ -1,6 +1,9 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,9 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-
-    FirebaseFirestore firestore;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,22 +33,41 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        firestore = FirebaseFirestore.getInstance();
+// DEBUG CODE:
+//        Map<String, Object> user = new HashMap<>();
+//        user.put("firstname", "Artur");
+//        user.put("lastname", "Womp");
+//        user.put("description", "Likes Cheese");
+//        firestore.collection("users").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//            @Override
+//            public void onSuccess(DocumentReference documentReference) {
+//                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG).show();
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(getApplicationContext(), "Failure", Toast.LENGTH_LONG).show();
+//            }
+//        });
+    }
 
-        Map<String, Object> user = new HashMap<>();
-        user.put("firstname", "Artur");
-        user.put("lastname", "Womp");
-        user.put("description", "Likes Cheese");
-        firestore.collection("users").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Failure", Toast.LENGTH_LONG).show();
-            }
-        });
+    public void onSignInClick(View view) {
+        EditText emailField = findViewById(R.id.editTextUsername);
+        EditText passwordField = findViewById(R.id.editTextPassword);
+        String email = emailField.getText().toString();
+        String password = passwordField.getText().toString();
+
+        if (AuthManager.auth(email, password)) {
+            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            startActivityForResult (intent,0);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Login failure, invalid username and/or password?", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void onRegisterClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+        startActivityForResult (intent,0);
     }
 }

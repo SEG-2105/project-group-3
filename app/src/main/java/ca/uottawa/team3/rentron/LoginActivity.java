@@ -3,6 +3,7 @@ package ca.uottawa.team3.rentron;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -59,10 +60,12 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordField.getText().toString();
 
         if (AuthManager.auth(email, password)) {
+            Log.d("AUTH:", "SUCCESSFUL");
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivityForResult (intent,0);
         }
         else {
+            Log.d("AUTH:", "FAILURE");
             Toast.makeText(getApplicationContext(), "Login failure, invalid username and/or password?", Toast.LENGTH_LONG).show();
         }
     }

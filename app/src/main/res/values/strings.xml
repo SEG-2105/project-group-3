@@ -2,6 +2,17 @@
     <string name="app_name">Rentron</string>
     <string name="register">New account? Register</string>
     <string name="sign_in">Sign in</string>
-    <string name="username">Username:</string>
+    <string name="username">Email address:</string>
     <string name="password">Password:</string>
+    <string name="confirm_password">Confirm password:</string>
+    <string name="first_name">First name:</string>
+    <string name="last_name">Last name:</string>
+    <string name="address">Address:</string>
+    <string name="birth_year">Birth year:</string>
+    <string name="pick_role">Choose your role:</string>
+    <string-array name="roles_array">
+        <item>Client</item>
+        <item>Landlord</item>
+        <item>Property Manager</item>
+    </string-array>
 </resources>

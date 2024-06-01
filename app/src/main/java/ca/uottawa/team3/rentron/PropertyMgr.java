@@ -5,4 +5,9 @@ public class PropertyMgr extends User {
         super(firstName, lastName, email, password);
         userData.put("role", "property-manager");
     }
+
+    public boolean isValid() {
+        //needs implementation...
+        return true;
+    }
 }

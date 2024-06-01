@@ -6,4 +6,8 @@ public class Client extends User { // least privileged type of user
         userData.put("birthyear", birthYear);
         userData.put("role", "client");
     }
+    public boolean isValid() {
+        //needs implementation...
+        return true;
+    }
 }

@@ -18,11 +18,10 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
         userData.put("password", password);
     }
 
-    public boolean isValid() {
-        // potential sanity-checking method to ensure user's HashMap is valid (ie. all fields are populated)
-        // implement later...
-        return true;
-    }
+    // potential sanity-checking method to ensure user's HashMap is valid (ie. all fields are populated)
+    // implement later...
+    public abstract boolean isValid();
+
 
     // getters/setters
     public Map<String, Object> getData() {

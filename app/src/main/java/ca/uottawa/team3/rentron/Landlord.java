@@ -6,4 +6,9 @@ public class Landlord extends User {
         userData.put("address", address);
         userData.put("role", "landlord");
     }
+
+    public boolean isValid() {
+        //needs implementation...
+        return true;
+    }
 }

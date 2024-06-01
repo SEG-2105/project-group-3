@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -69,5 +70,23 @@ public class LoginActivity extends AppCompatActivity {
     public void onRegisterClick(View view) {
         Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
         startActivityForResult (intent,0);
+    }
+
+    protected static class AuthManager {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        /* CAUTION: (copied from User.java)
+        /  Current password implementation is UNSAFE, passwords are passed through as Strings. (this applies to all User subclasses as well)
+        /  We need to find a safer method to store passwords (some type of hash?)
+        */
+        public static boolean auth(String email, String password) {
+            // leaving implementation for later...
+            return false;
+        }
+
+        public static boolean doesExist(User user) {
+            // leaving implementation for later...
+            return false;
+        }
     }
 }

@@ -35,7 +35,7 @@ public class UserCreator extends Application {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Toast.makeText(getApplicationContext(), "Registration failure (backend).", Toast.LENGTH_LONG).show();
-                    success[0] = true;
+                    success[0] = false;
                 }
             });
             return success[0];

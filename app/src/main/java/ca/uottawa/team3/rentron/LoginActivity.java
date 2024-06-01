@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (AuthManager.auth(email, password)) {
             Log.d("AUTH:", "SUCCESSFUL");
+            // ADD EXTRA DATA TO INTENT (PASS THROUGH ACTIVE USER)
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivityForResult (intent,0);
         }

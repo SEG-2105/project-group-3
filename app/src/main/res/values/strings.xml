@@ -17,4 +17,6 @@
         <item>Landlord</item>
         <item>Property Manager</item>
     </string-array>
+    <string name="default_welcome">Welcome, [user]!</string>
+    <string name="default_welcome_role">Your role is: [role]</string>
 </resources>

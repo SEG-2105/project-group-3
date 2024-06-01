@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -68,8 +69,11 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         findViewById(R.id.addressLayout).setVisibility(View.GONE);
     }
 
+    // BEFORE TESTING, TRY IMPLEMENTING PASSWORD HASHING....
     public void onClickAddUser() {
         UserCreator userCreator = new UserCreator();
+        User newUser;
+
         EditText emailField = (EditText)findViewById(R.id.editTextUsername);
         EditText passwordField = (EditText)findViewById(R.id.editTextPassword);
         EditText firstNameField = (EditText)findViewById(R.id.editTextFirstName);
@@ -77,14 +81,29 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         EditText addressField = (EditText)findViewById(R.id.editTextAddress);
         EditText birthYearField = (EditText)findViewById(R.id.editTextBirthYear);
 
+        String email = emailField.getText().toString();
+        String password = passwordField.getText().toString();
+        String firstName = firstNameField.getText().toString();
+        String lastName = lastNameField.getText().toString();
+        String address = addressField.getText().toString();
+        String birthYear = birthYearField.getText().toString();
+
         switch (selectedRole) {
             case 0: // client
-                Client newClient = new Client();
+                newUser = new Client(firstName, lastName, email, password, birthYear);
                 break;
             case 1: // landlord
+                newUser = new Landlord(firstName, lastName, email, password, address);
                 break;
             case 2: // property manager
+                newUser = new PropertyMgr(firstName, lastName, email, password);
                 break;
+            default:
+                newUser = new Client("","","","", ""); // create invalid Client
+        }
+        if (userCreator.add(newUser)) { // if registration successful
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivityForResult (intent,0);
         }
     }
 

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Rentron</string>
     <string name="register">New account? Register</string>
+    <string name="text_register">Register</string>
+    <string name="create_account">Create a Rentron account</string>
     <string name="sign_in">Sign in</string>
     <string name="username">Email address:</string>
     <string name="password">Password:</string>

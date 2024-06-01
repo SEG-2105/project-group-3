@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-// DEBUG CODE:
+// DEBUG CODE (FEEL FREE TO DELETE):
 //        Map<String, Object> user = new HashMap<>();
 //        user.put("firstname", "Artur");
 //        user.put("lastname", "Womp");
@@ -54,8 +54,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onSignInClick(View view) {
-        EditText emailField = findViewById(R.id.editTextUsername);
-        EditText passwordField = findViewById(R.id.editTextPassword);
+        EditText emailField = (EditText)findViewById(R.id.editTextUsername);
+        EditText passwordField = (EditText)findViewById(R.id.editTextPassword);
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();
 

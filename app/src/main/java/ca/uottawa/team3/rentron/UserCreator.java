@@ -13,15 +13,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class UserCreator extends Application {
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-    protected void add(User user) {
+    // returns false if user addition failed, else returns true
+    protected boolean add(User user) {
         // if user.isValid() returns false or doesExist(user) returns true, DO NOT proceed
         if (!user.isValid()) {
             Toast.makeText(getApplicationContext(), "Registration failure, invalid user details.", Toast.LENGTH_LONG).show();
+            return false;
         }
         else if (LoginActivity.AuthManager.doesExist(user)) {
             Toast.makeText(getApplicationContext(), "Registration failure, user already exists.", Toast.LENGTH_LONG).show();
+            return false;
         }
         else {
+            final boolean[] success = {true}; // hacky way to implement a return value with async Firebase functions
             firestore.collection("users").add(user.getData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
@@ -30,9 +34,11 @@ public class UserCreator extends Application {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), "Registration failure (backend)!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Registration failure (backend).", Toast.LENGTH_LONG).show();
+                    success[0] = true;
                 }
             });
+            return success[0];
         }
     }
 }

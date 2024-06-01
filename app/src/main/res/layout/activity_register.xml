@@ -22,7 +22,7 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/register"
+            android:text="@string/create_account"
             android:textSize="24sp" />
 
         <Space
@@ -171,20 +171,12 @@
             android:layout_height="10dp" />
 
         <Button
-            android:id="@+id/btnSignIn"
+            android:id="@+id/btnCreateAccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onSignInClick"
-            android:text="@string/sign_in" />
-
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onRegisterClick"
-            android:text="@string/register" />
+            android:onClick="onClickAddUser"
+            android:text="@string/text_register" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

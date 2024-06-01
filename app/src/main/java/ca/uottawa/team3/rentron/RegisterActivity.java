@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -70,8 +71,8 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     }
 
     // BEFORE TESTING, TRY IMPLEMENTING PASSWORD HASHING....
-    public void onClickAddUser() {
-        UserCreator userCreator = new UserCreator();
+    public void onClickAddUser(View view) {
+        UserCreator userCreator = new UserCreator(getApplicationContext());
         User newUser;
 
         EditText emailField = (EditText)findViewById(R.id.editTextUsername);
@@ -99,8 +100,9 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                 newUser = new PropertyMgr(firstName, lastName, email, password);
                 break;
             default:
-                newUser = new Client("","","","", ""); // create invalid Client
+                newUser = new Client("","","","", ""); // create invalid Client as "default" user
         }
+
         if (userCreator.add(newUser)) { // if registration successful
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivityForResult (intent,0);

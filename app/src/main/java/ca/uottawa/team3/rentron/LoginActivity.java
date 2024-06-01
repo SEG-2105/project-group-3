@@ -79,9 +79,9 @@ public class LoginActivity extends AppCompatActivity {
     protected static class AuthManager {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        /* CAUTION: (copied from User.java)
-        /  Current password implementation is UNSAFE, passwords are passed through as Strings. (this applies to all User subclasses as well)
-        /  We need to find a safer method to store passwords (some type of hash?)
+        /* CAUTION:
+        /  Current User.class password implementation is UNSAFE, passwords are passed through as Strings.
+        /  We should find a safer method to store passwords (through hashing?)
         */
         public static boolean auth(String email, String password) {
             // leaving implementation for later...

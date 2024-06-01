@@ -7,7 +7,7 @@ public class PropertyMgr extends User {
     }
 
     public boolean isValid() {
-        //needs implementation...
-        return true;
+        // needs implementation...
+        return false;
     }
 }

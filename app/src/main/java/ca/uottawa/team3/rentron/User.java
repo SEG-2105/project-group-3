@@ -7,8 +7,8 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
     Map<String, Object> userData; // what is passed to Firebase DB
 
     /* CAUTION:
-    /  Current password implementation is UNSAFE, passwords are passed through as Strings. (this applies to all User subclasses as well)
-    /  We need to find a safer method to store passwords (some type of hash?)
+    /  Current password implementation is UNSAFE, passwords are passed through as Strings.
+    /  We should find a safer method to store passwords (through hashing?)
     */
     public User(String firstName, String lastName, String email, String password) {
         userData = new HashMap<>();
@@ -18,8 +18,7 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
         userData.put("password", password);
     }
 
-    // potential sanity-checking method to ensure user's HashMap is valid (ie. all fields are populated)
-    // implement later...
+    // sanity-checking method to ensure user's HashMap is valid (ie. all fields are populated)
     public abstract boolean isValid();
 
 

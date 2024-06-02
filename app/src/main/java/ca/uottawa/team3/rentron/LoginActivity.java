@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (AuthManager.auth(email, password)) {
             Log.d("AUTH:", "SUCCESSFUL");
-            // ADD EXTRA DATA TO INTENT (PASS THROUGH ACTIVE USER)
+            // Add extra data to intent? (pass through active user)
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivityForResult (intent,0);
         }
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         */
         public static boolean auth(String email, String password) {
             // leaving implementation for later...
-            return false;
+            return true;
         }
 
         public static boolean doesExist(User user) {

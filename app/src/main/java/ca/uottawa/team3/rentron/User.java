@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class User { // encapsulates the user's HashMap (Firebase document)
-    Map<String, Object> userData; // what is passed to Firebase DB
+    protected Map<String, Object> userData; // what is passed to Firebase DB
 
     /* CAUTION:
     /  Current password implementation is UNSAFE, passwords are passed through as Strings.

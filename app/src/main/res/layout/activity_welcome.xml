@@ -4,37 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".WelcomeActivity">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/welcomeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="500dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/welcomeTextView"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/default_welcome"
-            android:textAlignment="center"
-            android:textSize="24sp" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/roleTextView"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/topBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:id="@+id/welcomeLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/default_welcome_role"
-            android:textAlignment="center"
-            android:textSize="24sp" />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="match_parent"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="128dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="500dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/welcomeTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/default_welcome"
+                android:textAlignment="center"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/roleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/default_welcome_role"
+                android:textAlignment="center"
+                android:textSize="24sp" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

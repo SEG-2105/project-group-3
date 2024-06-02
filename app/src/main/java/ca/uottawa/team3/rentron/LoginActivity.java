@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult (intent,0);
     }
 
-    protected static class AuthManager {
+    protected static class AuthManager { // may be replaced with Firebase solution
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         /* CAUTION:
@@ -86,11 +86,6 @@ public class LoginActivity extends AppCompatActivity {
         public static boolean auth(String email, String password) {
             // leaving implementation for later...
             return true;
-        }
-
-        public static boolean doesExist(User user) {
-            // leaving implementation for later...
-            return false;
         }
     }
 }

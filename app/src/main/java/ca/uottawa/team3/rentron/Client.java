@@ -6,8 +6,12 @@ public class Client extends User { // least privileged type of user
         userData.put("birthyear", birthYear);
         userData.put("role", "client");
     }
+
+    public Object getBirthYear() {
+        return this.userData.get("birthyear");
+    }
+
     public boolean isValid() {
-        // needs implementation...
-        return false;
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getData().get("password").equals("") || this.getRole().equals("") ||  this.getBirthYear().equals(""));
     }
 }

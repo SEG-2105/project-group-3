@@ -7,8 +7,12 @@ public class Landlord extends User {
         userData.put("role", "landlord");
     }
 
+    public Object getAddress() {
+        return this.userData.get("address");
+    }
+
     public boolean isValid() {
         // needs implementation...
-        return false;
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getData().get("password").equals("") || this.getRole().equals("") ||  this.getAddress().equals(""));
     }
 }

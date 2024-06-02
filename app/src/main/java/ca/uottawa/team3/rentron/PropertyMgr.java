@@ -7,7 +7,6 @@ public class PropertyMgr extends User {
     }
 
     public boolean isValid() {
-        // needs implementation...
-        return false;
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getData().get("password").equals("") || this.getRole().equals(""));
     }
 }

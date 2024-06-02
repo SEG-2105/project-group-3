@@ -2,16 +2,22 @@ package ca.uottawa.team3.rentron;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class UserCreator extends Application {
     Context context;
@@ -27,7 +33,7 @@ public class UserCreator extends Application {
             Toast.makeText(context, "Registration failure, invalid user details.", Toast.LENGTH_LONG).show();
             return false;
         }
-        else if (LoginActivity.AuthManager.doesExist(user)) {
+        else if (this.doesExist(user)) {
             Toast.makeText(context, "Registration failure, user already exists.", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -48,5 +54,22 @@ public class UserCreator extends Application {
             Log.d("Success bool:", Boolean.toString(success[0]));
             return success[0];
         }
+    }
+
+    public boolean doesExist(User user) { // no two users can have the same email
+        CollectionReference db = firestore.collection("users");
+        Task<QuerySnapshot> query = db.whereEqualTo("email", user.getEmail()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("doesExist():", document.getId() + " => " + document.getData());
+                    }
+                } else {
+                    Log.d("doesExist():", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+        return !query.getResult().isEmpty();
     }
 }

@@ -111,6 +111,9 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         String lastName = lastNameField.getText().toString();
         String address = addressField.getText().toString();
         String birthYear = birthYearField.getText().toString();
+        if (birthYear.equals("")) {
+            birthYear = "0";
+        }
 
         email = email.toLowerCase();
 
@@ -119,7 +122,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
             Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
             return;
         }
-        if ((Integer.valueOf(birthYear) < 1900 || Integer.valueOf(birthYear) >= 2024) && (selectedRole == 0)) {
+        if ((selectedRole == 0) && (Integer.valueOf(birthYear) < 1900 || Integer.valueOf(birthYear) >= 2024)) {
             Toast.makeText(getApplicationContext(), "Birth year is invalid.", Toast.LENGTH_LONG).show();
             return;
         }

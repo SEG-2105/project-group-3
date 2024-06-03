@@ -111,12 +111,14 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         String address = addressField.getText().toString();
         String birthYear = birthYearField.getText().toString();
 
+        email = email.toLowerCase();
+
         // basic field checking
         if (!password.equals(confirmPassword)) {
             Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
             return;
         }
-        if ((birthYear.length() != 4) && (selectedRole == 0)) {
+        if ((Integer.valueOf(birthYear) < 1900 || Integer.valueOf(birthYear) >= 2024) && (selectedRole == 0)) {
             Toast.makeText(getApplicationContext(), "Birth year is invalid.", Toast.LENGTH_LONG).show();
             return;
         }

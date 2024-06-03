@@ -5,7 +5,6 @@ import java.util.Map;
 
 public abstract class User { // encapsulates the user's HashMap (Firebase document)
     protected Map<String, Object> userData; // what is passed to Firebase DB
-    private String password;
 
     /* CAUTION:
     /  Current password implementation is UNSAFE, passwords are passed through as Strings.
@@ -17,6 +16,7 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
         userData.put("lastname", lastName);
         userData.put("email", email);
         userData.put("password", password);
+        userData.put("role", "");
     }
 
     // sanity-checking method to ensure user's HashMap is valid (ie. all fields are populated)

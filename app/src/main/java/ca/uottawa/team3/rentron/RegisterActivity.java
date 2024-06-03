@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     int selectedRole;
-    private FirebaseAuth mAuth;
+    //private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         setContentView(R.layout.activity_register);
 
         // populate firebase authenticator
-        mAuth = FirebaseAuth.getInstance();
+        //mAuth = FirebaseAuth.getInstance();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -52,16 +52,17 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         spinner.setAdapter(adapter);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){ // if user already logged in, move to main menu (we shouldn't even be here)...
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-            startActivityForResult (intent,0);
-        }
-    }
+    // firebaseauth unfinished
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        // Check if user is signed in (non-null) and update UI accordingly.
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if(currentUser != null){ // if user already logged in, move to main menu (we shouldn't even be here)...
+//            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+//            startActivityForResult (intent,0);
+//        }
+//    }
 
     public void onItemSelected(AdapterView<?> parent, View view, int spinnerPos, long id) {
         LinearLayout birthYearLayout = (LinearLayout)findViewById(R.id.birthYearLayout);

@@ -26,11 +26,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class UserCreator extends Application { // may be axed in favour of putting everything in RegisterActivity.java
     Context context;
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     public UserCreator(Context activeContext) {
         this.context = activeContext;
     }
-    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     // returns false if user addition failed, else returns true
     // TODO: BOTH METHODS NEED PROPER IMPLEMENTATION (FIREBASEAUTH)

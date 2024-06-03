@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailField.getText().toString().toLowerCase();
         String password = passwordField.getText().toString();
 
-        auth(getApplicationContext(), email, password);
+        auth(email, password);
 
     }
 
@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult (intent,0);
     }
 
-    private void auth(Context context, String email, String password) {
+    private void auth(String email, String password) {
         db.collection("users").whereEqualTo("email", email).whereEqualTo("password", password).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if(task.getResult().isEmpty()) {
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else {
                     Log.d("AUTH:", "SUCCESSFUL");
-                    Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_SHORT).show();
                     DocumentSnapshot user = task.getResult().getDocuments().get(0);
 
                     keepUserInfo((String)user.get("firstname"), (String)user.get("lastname"), (String)user.get("role"));
@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
                 }
             } else {
-                Toast.makeText(context, "An error has occurred.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
             }
         });
     }

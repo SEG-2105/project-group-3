@@ -1,9 +1,12 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 import androidx.activity.EdgeToEdge;
@@ -14,12 +17,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class WelcomeActivity extends AppCompatActivity {
+    private SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_welcome);
+
+        TextView welcomeText = findViewById(R.id.welcomeTextView);
+        TextView roleText = findViewById(R.id.roleTextView);
+        welcomeText.setText("Welcome, " + pref.getString("firstName", "") + " " + pref.getString("lastName", "") + "!");
+        roleText.setText("Your role is: " + pref.getString("role",""));
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -48,6 +58,10 @@ public class WelcomeActivity extends AppCompatActivity {
 
 
     private void signOut() {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.clear();
+        editor.apply();
+
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivityForResult (intent,0);
     }

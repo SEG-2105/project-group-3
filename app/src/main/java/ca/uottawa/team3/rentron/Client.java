@@ -13,6 +13,6 @@ public class Client extends User { // least privileged type of user
     }
 
     public boolean isValid() {
-        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getData().get("password").equals("") || this.getRole().equals("") ||  this.getBirthYear().equals(""));
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getPassword().equals("") || this.getRole().equals("") ||  this.getBirthYear().equals(""));
     }
 }

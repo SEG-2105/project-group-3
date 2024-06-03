@@ -13,6 +13,6 @@ public class Landlord extends User {
 
     public boolean isValid() {
         // needs implementation...
-        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getData().get("password").equals("") || this.getRole().equals("") ||  this.getAddress().equals(""));
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getPassword().equals("") || this.getRole().equals("") ||  this.getAddress().equals(""));
     }
 }

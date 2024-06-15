@@ -17,22 +17,24 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import javax.crypto.SecretKey;
+
+import ca.uottawa.team3.rentron.Users.Client;
+import ca.uottawa.team3.rentron.Users.Hashing;
+import ca.uottawa.team3.rentron.Users.Landlord;
+import ca.uottawa.team3.rentron.Users.PropertyMgr;
+import ca.uottawa.team3.rentron.Users.User;
+import ca.uottawa.team3.rentron.Users.UserCreator;
 
 public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     int selectedRole;
-    //private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
-
-        // populate firebase authenticator
-        //mAuth = FirebaseAuth.getInstance();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -51,18 +53,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
-
-    // firebaseauth unfinished
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        if(currentUser != null){ // if user already logged in, move to main menu (we shouldn't even be here)...
-//            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-//            startActivityForResult (intent,0);
-//        }
-//    }
 
     public void onItemSelected(AdapterView<?> parent, View view, int spinnerPos, long id) {
         LinearLayout birthYearLayout = (LinearLayout)findViewById(R.id.birthYearLayout);
@@ -91,7 +81,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         findViewById(R.id.addressLayout).setVisibility(View.GONE);
     }
 
-    // BEFORE TESTING, TRY IMPLEMENTING PASSWORD HASHING....
     public void onClickAddUser(View view) {
         UserCreator userCreator = new UserCreator(getApplicationContext());
         User newUser;
@@ -105,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         EditText birthYearField = (EditText)findViewById(R.id.editTextBirthYear);
 
         String email = emailField.getText().toString();
-        String password = passwordField.getText().toString();
+        String passwordPlain = passwordField.getText().toString();
         String confirmPassword = confirmPasswordField.getText().toString();
         String firstName = firstNameField.getText().toString();
         String lastName = lastNameField.getText().toString();
@@ -118,7 +107,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         email = email.toLowerCase();
 
         // basic field checking
-        if (!password.equals(confirmPassword)) {
+        if (!passwordPlain.equals(confirmPassword)) {
             Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
             return;
         }
@@ -131,19 +120,24 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
             return;
         }
 
+        // password hash
+        Hashing hasher = new Hashing(getApplicationContext());
+        byte[] salt = hasher.generateSalt();
+        SecretKey password = hasher.hashPassword(passwordPlain.toCharArray(), salt);
 
         switch (selectedRole) {
             case 0: // client
-                newUser = new Client(firstName, lastName, email, password, birthYear);
+                newUser = new Client(firstName, lastName, email, password, salt, birthYear);
                 break;
             case 1: // landlord
-                newUser = new Landlord(firstName, lastName, email, password, address);
+                newUser = new Landlord(firstName, lastName, email, password, salt, address);
                 break;
             case 2: // property manager
-                newUser = new PropertyMgr(firstName, lastName, email, password);
+                newUser = new PropertyMgr(firstName, lastName, email, password, salt);
                 break;
             default:
-                newUser = new Client("","","","", ""); // create invalid Client as "default" user
+                // create invalid Client as "default" user, we should never be in this state though
+                newUser = new Client("","","",null, null, "");
         }
 
         if (userCreator.add(newUser)) { // if registration successful

@@ -1,7 +1,10 @@
-package ca.uottawa.team3.rentron;
+package ca.uottawa.team3.rentron.Users;
 
+import android.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
 
 public abstract class User { // encapsulates the user's HashMap (Firebase document)
     protected Map<String, Object> userData; // what is passed to Firebase DB
@@ -10,12 +13,19 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
     /  Current password implementation is UNSAFE, passwords are passed through as Strings.
     /  We should find a safer method to store passwords (through hashing?)
     */
-    public User(String firstName, String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, SecretKey password, byte[] salt) {
+        String encodedPassword = "";
+        String encodedSalt = "";
+        if (password != null) {
+            encodedPassword = Base64.encodeToString(password.getEncoded(), Base64.DEFAULT);
+            encodedSalt = Base64.encodeToString(salt, Base64.DEFAULT);
+        }
         userData = new HashMap<>();
         userData.put("firstname", firstName);
         userData.put("lastname", lastName);
         userData.put("email", email);
-        userData.put("password", password);
+        userData.put("password", encodedPassword);
+        userData.put("salt", encodedSalt);
         userData.put("role", "");
     }
 

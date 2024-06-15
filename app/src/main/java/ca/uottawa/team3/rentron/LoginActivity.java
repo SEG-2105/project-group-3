@@ -1,36 +1,35 @@
 package ca.uottawa.team3.rentron;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.DestroyFailedException;
+
+import ca.uottawa.team3.rentron.Users.Hashing;
 
 public class LoginActivity extends AppCompatActivity {
 
-    //private FirebaseAuth mAuth;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,23 +41,6 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-// DEBUG CODE (FEEL FREE TO DELETE):
-//        Map<String, Object> user = new HashMap<>();
-//        user.put("firstname", "Artur");
-//        user.put("lastname", "Womp");
-//        user.put("description", "Likes Cheese");
-//        firestore.collection("users").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//            @Override
-//            public void onSuccess(DocumentReference documentReference) {
-//                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG).show();
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Toast.makeText(getApplicationContext(), "Failure", Toast.LENGTH_LONG).show();
-//            }
-//        });
     }
 
     public void onSignInClick(View view) {
@@ -76,21 +58,32 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult (intent,0);
     }
 
-    private void auth(String email, String password) {
-        db.collection("users").whereEqualTo("email", email).whereEqualTo("password", password).get().addOnCompleteListener(task -> {
+    private void auth(String email, String passwordPlain) {
+        db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if(task.getResult().isEmpty()) {
                     Log.d("AUTH:", "FAILURE");
                     Toast.makeText(getApplicationContext(), "Login failure, invalid username and/or password?", Toast.LENGTH_LONG).show();
                 }
                 else {
-                    Log.d("AUTH:", "SUCCESSFUL");
-                    Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_SHORT).show();
                     DocumentSnapshot user = task.getResult().getDocuments().get(0);
+                    Hashing hasher = new Hashing(getApplicationContext());
+                    byte[] salt = Base64.decode((String)user.get("salt"), Base64.DEFAULT);
+                    byte[] encodedPass = Base64.decode((String)user.get("password"), Base64.DEFAULT);
+                    SecretKey password = new SecretKeySpec(encodedPass, 0, encodedPass.length, "HmacSHA256");
+                    //Log.d("AUTH:", "SALT = " + salt.toString() + " , HASH = " + encodedPass.toString());
+                    if (hasher.verifyPassword(salt, passwordPlain, password)) {
+                        Log.d("AUTH:", "SUCCESSFUL");
+                        Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_SHORT).show();
 
-                    keepUserInfo((String)user.get("firstname"), (String)user.get("lastname"), (String)user.get("role"));
-                    startActivity(new Intent(getApplicationContext(), WelcomeActivity.class));
-                    finish();
+                        keepUserInfo((String)user.get("email"));
+                        startActivity(new Intent(getApplicationContext(), WelcomeActivity.class));
+                        finish();
+                    }
+                    else {
+                        Log.d("AUTH:", "FAILURE");
+                        Toast.makeText(getApplicationContext(), "Login failure, invalid username and/or password?", Toast.LENGTH_LONG).show(); // leave this more ambiguous later
+                    }
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
@@ -98,13 +91,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // may not need if FirebaseAuth implemented
-    private void keepUserInfo(String firstName, String lastName, String role) {
+    // remembers active user for context
+    private void keepUserInfo(String email) {
         SharedPreferences pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString("firstName", firstName);
-        editor.putString("lastName", lastName);
-        editor.putString("role", role);
+        String encodedEmail = "";
+        try {
+            encodedEmail = Base64.encodeToString(email.getBytes("UTF-8"), Base64.DEFAULT);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        editor.putString("active", encodedEmail);
         editor.commit();
     }
+
 }

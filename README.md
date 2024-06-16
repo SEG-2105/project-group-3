@@ -1,5 +1,11 @@
-# project-group-3
-Final Project SEG2105 (Rentron Rental App) - Team 3
+# Rentron
+Property rental and management app for final project of SEG2105 - Team 3
 
-project-group-3 created by GitHub Classroom
+Implemented in Java.
 
+Milestones | Finished  
+---------|----------
+Deliverable 1   |✔️
+Deliverable 2    |🏗️
+Deliverable 3   |❌
+Deliverable 4    |❌

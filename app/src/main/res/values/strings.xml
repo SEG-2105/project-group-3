@@ -2,6 +2,7 @@
     <string name="app_name">Rentron</string>
     <string name="register">New account? Register</string>
     <string name="text_register">Register</string>
+    <string name="property_register">Register Property</string>
     <string name="create_account">Create a Rentron account</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
@@ -20,4 +21,5 @@
     </string-array>
     <string name="default_welcome">Welcome, [user]!</string>
     <string name="default_welcome_role">Your role is: [role]</string>
+    <string name="properties">Properties:</string>
 </resources>

@@ -67,6 +67,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     String yourRole = ("Your role is: " + role);
                     welcomeText.setText(welcome);
                     roleText.setText(yourRole);
+
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();

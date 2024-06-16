@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -16,9 +18,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.List;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
+    Button btnAddProperty;
+    List<Property> properties;
+    ListView listViewProperties;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,26 @@ public class PropertiesActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
+        listViewProperties = findViewById(R.id.listViewProperties);
+        // Clear the previous list
+        properties.clear();
+
+        // Iterate through all the properties
+        //work on for loop to get properties from database
+        /*for (...) {
+            // Get the product
+            Property p = .getValue(Property.class);
+
+            // Add the product to the product list
+            properties.add(p);
+        }*/
+
+        // Create the adapter
+        PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
+
+        // Attach the adapter to the list view
+        listViewProperties.setAdapter(propertiesAdapter);
 
     }
 

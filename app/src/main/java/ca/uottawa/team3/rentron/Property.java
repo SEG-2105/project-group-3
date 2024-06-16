@@ -11,6 +11,8 @@ public class Property {
         propertyData.put("type", type);
         if ("apartment".equals(propertyData.get("type"))) {
             propertyData.put("floor", floor);
+        } else {
+            propertyData.put("floor", "N/A");
         }
         propertyData.put("numRoom", numRoom);
         propertyData.put("numBathroom", numBathroom);
@@ -22,38 +24,38 @@ public class Property {
         propertyData.put("utilities", utilities);
     }
 
-    public Object getAddress() {
-        return this.propertyData.get("address");
+    public String getAddress() {
+        return this.propertyData.get("address").toString();
     }
-    public Object getType() {
-        return this.propertyData.get("type");
+    public String getType() {
+        return this.propertyData.get("type").toString();
     }
-    public Object getFloor() {
-        return this.propertyData.get("floor");
+    public String getFloor() {
+        return this.propertyData.get("floor").toString();
     }
-    public Object getNumRoom() {
-        return this.propertyData.get("numRoom");
+    public String getNumRoom() {
+        return this.propertyData.get("numRoom").toString();
     }
-    public Object getNumBathroom() {
-        return this.propertyData.get("numBathroom");
+    public String getNumBathroom() {
+        return this.propertyData.get("numBathroom").toString();
     }
-    public Object getNumFloor() {
-        return this.propertyData.get("numFloor");
+    public String getNumFloor() {
+        return this.propertyData.get("numFloor").toString();
     }
-    public Object getArea() {
-        return this.propertyData.get("area");
+    public String getArea() {
+        return this.propertyData.get("area").toString();
     }
-    public Object getLaundry() {
-        return this.propertyData.get("laundry");
+    public Boolean getLaundry() {
+        return Boolean.valueOf(this.propertyData.get("laundry").toString());
     }
-    public Object getNumParkingSpot() {
-        return this.propertyData.get("numParkingSpot");
+    public String getNumParkingSpot() {
+        return this.propertyData.get("numParkingSpot").toString();
     }
-    public Object getRent() {
-        return this.propertyData.get("rent");
+    public String getRent() {
+        return this.propertyData.get("rent").toString();
     }
-    public Object getUtilities() {
-        return this.propertyData.get("utilities");
+    public String getUtilities() {
+        return this.propertyData.get("utilities").toString();
     }
 
     public boolean isValid() {

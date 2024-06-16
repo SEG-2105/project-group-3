@@ -26,10 +26,6 @@ public class UserCreator extends Application {
             Toast.makeText(context, "Registration failure, invalid user details.", Toast.LENGTH_LONG).show();
             return false;
         }
-        else if (this.doesExist((String)user.getEmail())) {
-            Toast.makeText(context, "Registration failure, user already exists.", Toast.LENGTH_LONG).show();
-            return false;
-        }
         else {
             firestore.collection("users").add(user.getData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override

@@ -2,8 +2,11 @@ package ca.uottawa.team3.rentron;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -11,8 +14,21 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,7 +43,6 @@ import ca.uottawa.team3.rentron.Users.User;
 import ca.uottawa.team3.rentron.Users.UserCreator;
 
 public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
     int selectedRole;
 
     @Override
@@ -35,6 +50,17 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
+
+        Toolbar topBar = findViewById(R.id.topBar);
+        setSupportActionBar(topBar);
+
+        topBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult (intent,0);
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -118,6 +144,18 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(getApplicationContext(), "Email is invalid.", Toast.LENGTH_LONG).show();
             return;
+        }
+
+        // then, check if user already exists...
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        CollectionReference db = firestore.collection("users");
+        Task<QuerySnapshot> query = db.whereEqualTo("email", email).get();
+        while(!query.isComplete()); // hacky way to wrangle async. Firebase methods, should be changed
+        if (query.isSuccessful()) {
+            if (!query.getResult().isEmpty()) {
+                Toast.makeText(getApplicationContext(), "User already exists with the same email.", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
 
         // password hash

@@ -3,7 +3,7 @@ Property rental and management app for final project of SEG2105 - Team 3
 
 Implemented in Java.
 
-Milestones | Finished  
+Milestones | Progress  
 ---------|----------
 Deliverable 1   |✔️
 Deliverable 2    |🏗️

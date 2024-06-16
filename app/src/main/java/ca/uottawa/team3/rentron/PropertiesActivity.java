@@ -41,7 +41,8 @@ public class PropertiesActivity extends AppCompatActivity {
                     return true;
                 }
                 else if (item.getItemId() == R.id.welcome) {
-                    startActivity(new Intent(getApplicationContext(),WelcomeActivity.class));
+                    Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                    startActivityForResult(intent, 0);
                     overridePendingTransition(0,0);
                     return true;
                 }
@@ -55,6 +56,14 @@ public class PropertiesActivity extends AppCompatActivity {
             return insets;
         });
 
+    }
+
+    // ensure that navigation view is in correct position when returning to activity (via Back button)
+    @Override
+    public void onStart() {
+        super.onStart();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.properties);
     }
 
     @Override
@@ -72,6 +81,13 @@ public class PropertiesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // disable animations when leaving activity (intended for when Back button is pressed)
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0,0);
+    }
+
     private void signOut() {
         // removes active user entry from sharedpref
         // todo: (possibly) Remember me feature?
@@ -81,6 +97,7 @@ public class PropertiesActivity extends AppCompatActivity {
 
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivityForResult (intent,0);
+        finish();
     }
 
 }

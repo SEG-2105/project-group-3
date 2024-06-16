@@ -76,7 +76,7 @@ public class WelcomeActivity extends AppCompatActivity {
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
 
-        BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.welcome);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -84,7 +84,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
                 if (item.getItemId() == R.id.properties)
                 {
-                    startActivity(new Intent(getApplicationContext(),PropertiesActivity.class));
+                    Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                    startActivityForResult(intent, 0);
                     overridePendingTransition(0,0);
                     return true;
                 }
@@ -102,6 +103,21 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    // ensure that navigation view is in correct position when returning to activity (via Back button)
+    @Override
+    public void onStart() {
+        super.onStart();
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.welcome);
+    }
+
+    // disable animations when leaving activity (intended for when Back button is pressed)
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0,0);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_options, menu);
@@ -117,7 +133,6 @@ public class WelcomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     private void signOut() {
         // removes active user entry from sharedpref
         // todo: (possibly) Remember me feature?
@@ -127,5 +142,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivityForResult (intent,0);
+        finish();
     }
 }

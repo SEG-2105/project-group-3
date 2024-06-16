@@ -180,7 +180,8 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
 
         if (userCreator.add(newUser)) { // if registration successful
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult (intent,0);
+            startActivityForResult(intent,0);
+            finish();
         }
     }
 

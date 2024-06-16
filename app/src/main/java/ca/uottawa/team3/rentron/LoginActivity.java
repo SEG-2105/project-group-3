@@ -29,7 +29,6 @@ import javax.security.auth.DestroyFailedException;
 import ca.uottawa.team3.rentron.Users.Hashing;
 
 public class LoginActivity extends AppCompatActivity {
-
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +40,17 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // remove active user data upon return to login page
+        SharedPreferences pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.clear();
+        editor.apply();
+        Log.d("LoginActivity", "onResume(): cleared data successfully");
     }
 
     public void onSignInClick(View view) {

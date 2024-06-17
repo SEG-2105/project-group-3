@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -17,9 +19,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PropertiesActivity extends AppCompatActivity {
@@ -34,6 +43,8 @@ public class PropertiesActivity extends AppCompatActivity {
         pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_properties);
+        properties = new ArrayList<Property>();
+        Toast.makeText(getApplicationContext(), "Properties list created", Toast.LENGTH_SHORT).show();
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -63,27 +74,6 @@ public class PropertiesActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
-
-        listViewProperties = findViewById(R.id.listViewProperties);
-        // Clear the previous list
-        properties.clear();
-
-        // Iterate through all the properties
-        //work on for loop to get properties from database
-        /*for (...) {
-            // Get the product
-            Property p = .getValue(Property.class);
-
-            // Add the product to the product list
-            properties.add(p);
-        }*/
-
-        // Create the adapter
-        PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
-
-        // Attach the adapter to the list view
-        listViewProperties.setAdapter(propertiesAdapter);
-
     }
 
     // ensure that navigation view is in correct position when returning to activity (via Back button)
@@ -92,6 +82,37 @@ public class PropertiesActivity extends AppCompatActivity {
         super.onStart();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.properties);
+
+        listViewProperties = findViewById(R.id.listViewProperties);
+        // Clear the previous list
+        properties.clear();
+
+        // Iterate through all the properties
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.collection("properties").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
+                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
+                                        (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"));
+                                properties.add(db_property);
+                                Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
+                            }
+
+                            // Create the adapter
+                            PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
+
+                            // Attach the adapter to the list view
+                            listViewProperties.setAdapter(propertiesAdapter);
+                        } else {
+                            Log.d("PropertiesActivity:", "Error getting properties: ", task.getException());
+                        }
+                    }
+                });
     }
 
     @Override

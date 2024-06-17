@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Property {
@@ -7,6 +8,7 @@ public class Property {
     protected Map<String, Object> propertyData;
 
     public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities) {
+        propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
         if ("apartment".equals(propertyData.get("type"))) {

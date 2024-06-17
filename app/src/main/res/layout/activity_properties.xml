@@ -29,8 +29,6 @@
         android:layout_marginBottom="115dp"
         android:orientation="vertical">
 
-        //android:visibility="gone"
-
         <TextView
             android:id="@+id/textViewProperties"
             android:layout_width="match_parent"
@@ -48,7 +46,7 @@
             android:id="@+id/btnCreateProperty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:text="@string/property_register" />
     </LinearLayout>
 

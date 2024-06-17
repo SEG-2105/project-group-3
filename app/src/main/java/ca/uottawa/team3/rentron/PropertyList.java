@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class PropertyList  extends ArrayAdapter<Property> {
     private Activity context;
     List<Property> properties;
 
-    public PropertyList(Activity context, List<Property> products) {
-        super(context, R.layout.layout_property_item, products);
+    public PropertyList(Activity context, List<Property> properties) {
+        super(context, R.layout.layout_property_item, properties);
         this.context = context;
         this.properties = properties;
     }
@@ -50,6 +51,7 @@ public class PropertyList  extends ArrayAdapter<Property> {
         parking.setText(property.getNumParkingSpot());
         rent.setText(property.getRent());
         utilities.setText(property.getUtilities());
+        Toast.makeText(context, "Instantiated list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;
     }
 

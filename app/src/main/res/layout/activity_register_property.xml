@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="onClickFindManager"
                 android:text="Choose Manager"/>
-            
+
         </LinearLayout>
 
         <Space

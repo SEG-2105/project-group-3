@@ -85,7 +85,6 @@
                 android:textSize="15sp"
                 android:textAlignment="center"
                 android:gravity="center"
-                android:layout_weight="1"
                 android:text="Current Manager:"
                 />
 
@@ -93,31 +92,14 @@
                 android:layout_width="20dp"
                 android:layout_height="0dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <Spinner
+                android:id="@+id/propertyManager"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textAlignment="center"
-                android:gravity="center"
                 android:layout_weight="1"
-                android:text="None Selected"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnSelectManager"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onClickFindManager"
-                android:text="Choose Manager"/>
-
+                android:background="@android:drawable/btn_default"
+                android:ems="10"
+                android:gravity="center" />
         </LinearLayout>
 
         <Space
@@ -219,13 +201,33 @@
                 android:text=" Sq. ft"/>
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/propertyLaundry"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Laundry"/>
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:text="Laundry:"
+                />
+
+            <Space
+                android:layout_width="20dp"
+                android:layout_height="0dp" />
+
+            <Spinner
+                android:id="@+id/propertyLaundry"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown"
+                />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

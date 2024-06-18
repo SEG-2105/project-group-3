@@ -161,10 +161,12 @@ public class PropertiesActivity extends AppCompatActivity {
                     }
                 });
 
+        // ONLY LANDLORDS CAN HAVE ACCESS TO THIS BUTTON
         btnProperty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(), RegisterPropertyActivity.class);
+                startActivityForResult (intent,0);
             }
         });
 

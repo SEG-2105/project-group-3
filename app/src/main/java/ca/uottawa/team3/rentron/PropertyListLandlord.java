@@ -37,8 +37,8 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         TextView parking = listViewItem.findViewById(R.id.textViewParking);
         TextView rent = listViewItem.findViewById(R.id.textViewRent);
         TextView utilities = listViewItem.findViewById(R.id.textViewUtilities);
-        TextView manager = listViewItem.findViewById(R.id.textViewRent);
-        TextView client = listViewItem.findViewById(R.id.textViewUtilities);
+        TextView manager = listViewItem.findViewById(R.id.textViewManager);
+        TextView client = listViewItem.findViewById(R.id.textViewClient);
 
         Property property = properties.get(position);
         address.setText(property.getAddress());

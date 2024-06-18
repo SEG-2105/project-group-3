@@ -128,8 +128,10 @@ public class PropertiesActivity extends AppCompatActivity {
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
                                         (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
                                         (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
-                                if (role.equals("landlord") && db_property.getLandlord().equals(email)) {
-                                    properties.add(db_property);
+                                if (role.equals("landlord")) {
+                                    if (db_property.getLandlord().equals(email)){
+                                        properties.add(db_property);
+                                    }
                                 } else {
                                     if (db_property.getClient().isEmpty()){
                                         properties.add(db_property);

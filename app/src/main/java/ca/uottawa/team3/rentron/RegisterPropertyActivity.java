@@ -1,17 +1,41 @@
 package ca.uottawa.team3.rentron;
 
+import ca.uottawa.team3.rentron.Users.*;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class RegisterPropertyActivity extends AppCompatActivity {
+
+    Button selectMgr;
+    FirebaseFirestore firestore;
+    List<PropertyMgr> propertyMgrList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +45,8 @@ public class RegisterPropertyActivity extends AppCompatActivity {
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
+
+        selectMgr = (Button)findViewById(R.id.propertyManager);
 
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,6 +61,63 @@ public class RegisterPropertyActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+    }
+
+    // set listener for PropertyMgr selector button (to open new register_property_selectmgr dialog)
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        firestore = FirebaseFirestore.getInstance();
+
+        selectMgr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPropertyMgrDialog(firestore);
+            }
+        });
+    }
+
+    private void showPropertyMgrDialog(FirebaseFirestore db) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.register_property_selectmgr_dialog, null);
+        dialogBuilder.setView(dialogView);
+        final ListView propertyMgrListView = dialogView.findViewById(R.id.listViewPropertyMgrs);
+
+        ArrayList<PropertyMgr> propertyMgrList = new ArrayList<PropertyMgr>();
+
+        db.collection("users").whereEqualTo("role", "property-manager")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                PropertyMgr propertyMgr = new PropertyMgr((String) document.get("firstname"), (String) document.get("lastname"),
+                                        (String) document.get("email"));
+                                propertyMgrList.add(propertyMgr);
+                            }
+                            PropertyMgrListAdapter mgrsAdapter = new PropertyMgrListAdapter(RegisterPropertyActivity.this, propertyMgrList);
+
+                            propertyMgrListView.setAdapter(mgrsAdapter);
+                        } else {
+                            Log.d("showPropertyMgrDialog:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        dialogBuilder.setTitle("Property Managers:");
+        final AlertDialog b = dialogBuilder.create();
+        b.show();
+        propertyMgrListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                PropertyMgr propertyMgr = propertyMgrList.get(i);
+                selectMgr.setText(propertyMgr.getFirstName() + " " + propertyMgr.getLastName());
+                b.dismiss();
+            }
         });
     }
 }

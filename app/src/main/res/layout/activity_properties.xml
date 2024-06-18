@@ -43,11 +43,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/btnCreateProperty"
+            android:id="@+id/btnViewProperty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/property_register" />
+            android:text="@string/property_register"
+            android:visibility ="gone" />
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -24,18 +27,21 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
-    Button btnAddProperty;
+    Button btnProperty;
     List<Property> properties;
     ListView listViewProperties;
+    FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +80,7 @@ public class PropertiesActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
     }
 
     // ensure that navigation view is in correct position when returning to activity (via Back button)
@@ -88,7 +95,28 @@ public class PropertiesActivity extends AppCompatActivity {
         properties.clear();
 
         // Iterate through all the properties
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+
+        btnProperty = findViewById(R.id.btnViewProperty);
+
+        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
+
+        String activeEmail = "";
+        String activeRole = "";
+        try {
+            activeEmail = new String(active, "UTF-8");
+            activeRole = new String(active1, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        String role = activeRole;
+        String email = activeEmail;
+
+        if (role.equals("landlord")) {
+            btnProperty.setVisibility(View.VISIBLE);
+        }
+
         firestore.collection("properties").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -98,21 +126,46 @@ public class PropertiesActivity extends AppCompatActivity {
                                 Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
                                 Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                        (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"));
-                                properties.add(db_property);
+                                        (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
+                                        (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
+                                if (role.equals("landlord") && db_property.getLandlord().equals(email)) {
+                                    properties.add(db_property);
+                                } else {
+                                    if (db_property.getClient().isEmpty()){
+                                        properties.add(db_property);
+                                    }
+                                }
+
                                 Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
                             }
 
-                            // Create the adapter
-                            PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
+                            if (role.equals("landlord")) {
+                                // Create the adapter
+                                PropertyListLandlord propertiesAdapter = new PropertyListLandlord(PropertiesActivity.this, properties);
 
-                            // Attach the adapter to the list view
-                            listViewProperties.setAdapter(propertiesAdapter);
+                                // Attach the adapter to the list view
+                                listViewProperties.setAdapter(propertiesAdapter);
+                            } else {
+                                // Create the adapter
+                                PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
+
+                                // Attach the adapter to the list view
+                                listViewProperties.setAdapter(propertiesAdapter);
+                            }
+
                         } else {
                             Log.d("PropertiesActivity:", "Error getting properties: ", task.getException());
                         }
                     }
                 });
+
+        btnProperty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
     }
 
     @Override

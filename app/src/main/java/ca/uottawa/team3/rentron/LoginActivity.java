@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("AUTH:", "SUCCESSFUL");
                         Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_SHORT).show();
 
-                        keepUserInfo((String)user.get("email"));
+                        keepUserInfo((String)user.get("email"), (String)user.get("role"));
                         startActivity(new Intent(getApplicationContext(), WelcomeActivity.class));
                         finish();
                     }
@@ -102,16 +102,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // remembers active user for context
-    private void keepUserInfo(String email) {
+    private void keepUserInfo(String email, String role) {
         SharedPreferences pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         String encodedEmail = "";
+        String encodedRole = "";
         try {
             encodedEmail = Base64.encodeToString(email.getBytes("UTF-8"), Base64.DEFAULT);
+            encodedRole = Base64.encodeToString(role.getBytes("UTF-8"), Base64.DEFAULT);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         editor.putString("active", encodedEmail);
+        editor.putString("activeRole", encodedRole);
         editor.commit();
     }
 

@@ -3,11 +3,15 @@ package ca.uottawa.team3.rentron;
 import java.util.HashMap;
 import java.util.Map;
 
+import ca.uottawa.team3.rentron.Users.Client;
+import ca.uottawa.team3.rentron.Users.Landlord;
+import ca.uottawa.team3.rentron.Users.PropertyMgr;
+
 public class Property {
 
     protected Map<String, Object> propertyData;
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities) {
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -24,7 +28,55 @@ public class Property {
         propertyData.put("numParkingSpot", numParkingSpot);
         propertyData.put("rent", rent);
         propertyData.put("utilities", utilities);
+        propertyData.put("landlord", landlord);
+        propertyData.put("manager","");
+        propertyData.put("client","");
     }
+
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager) {
+        propertyData = new HashMap<>();
+        propertyData.put("address", address);
+        propertyData.put("type", type);
+        if ("apartment".equals(propertyData.get("type"))) {
+            propertyData.put("floor", floor);
+        } else {
+            propertyData.put("floor", "N/A");
+        }
+        propertyData.put("numRoom", numRoom);
+        propertyData.put("numBathroom", numBathroom);
+        propertyData.put("numFloor", numFloor);
+        propertyData.put("area", area);
+        propertyData.put("laundry", laundry);
+        propertyData.put("numParkingSpot", numParkingSpot);
+        propertyData.put("rent", rent);
+        propertyData.put("utilities", utilities);
+        propertyData.put("landlord", landlord);
+        propertyData.put("manager",manager);
+        propertyData.put("client","");
+    }
+
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager, String client) {
+        propertyData = new HashMap<>();
+        propertyData.put("address", address);
+        propertyData.put("type", type);
+        if ("apartment".equals(propertyData.get("type"))) {
+            propertyData.put("floor", floor);
+        } else {
+            propertyData.put("floor", "N/A");
+        }
+        propertyData.put("numRoom", numRoom);
+        propertyData.put("numBathroom", numBathroom);
+        propertyData.put("numFloor", numFloor);
+        propertyData.put("area", area);
+        propertyData.put("laundry", laundry);
+        propertyData.put("numParkingSpot", numParkingSpot);
+        propertyData.put("rent", rent);
+        propertyData.put("utilities", utilities);
+        propertyData.put("landlord", landlord);
+        propertyData.put("manager",manager);
+        propertyData.put("client",client);
+    }
+
 
     public String getAddress() {
         return this.propertyData.get("address").toString();
@@ -58,6 +110,15 @@ public class Property {
     }
     public String getUtilities() {
         return this.propertyData.get("utilities").toString();
+    }
+    public String getLandlord() {
+        return this.propertyData.get("landlord").toString();
+    }
+    public String getManager() {
+        return this.propertyData.get("manager").toString();
+    }
+    public String getClient() {
+        return this.propertyData.get("client").toString();
     }
 
     public boolean isValid() {

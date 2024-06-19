@@ -91,8 +91,6 @@ public class EditPropertyActivity extends AppCompatActivity {
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
                                         (boolean)document.get("heating"), (boolean)document.get("water"), (boolean)document.get("hydro"),
                                         (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
-
-
                             }
                         } else {
                             Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());

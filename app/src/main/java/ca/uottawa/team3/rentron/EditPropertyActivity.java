@@ -23,8 +23,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -52,7 +50,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, edit, selectClient, deleteProperty;
+    Button selectMgr, edit, selectClient;
     ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
     FirebaseFirestore firestore;
@@ -81,11 +79,10 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         propertyType.setOnItemSelectedListener(this);
         propertyLaundry.setOnItemSelectedListener(this);
 
-        selectMgr = (Button) findViewById(R.id.propertyManager);
-        selectClient = (Button) findViewById(R.id.propertyClient);
+        selectMgr = (Button)findViewById(R.id.propertyManager);
+        selectClient = (Button)findViewById(R.id.propertyClient);
 
-        edit = (Button) findViewById(R.id.btnEditProperty);
-        deleteProperty = (Button) findViewById(R.id.btnDeleteProperty);
+        edit = (Button)findViewById(R.id.btnEditProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
         propertyUnitLabel = findViewById(R.id.propertyUnitLabel);
@@ -102,11 +99,11 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Property db_property = new Property((String) document.get("address"), (String) document.get("type"), (String) document.get("unit"), (String) document.get("floor"),
-                                        (String) document.get("numRoom"), (String) document.get("numBathroom"), (String) document.get("numFloor"), (String) document.get("area"),
-                                        (String) document.get("laundry"), (String) document.get("numParkingSpot"), (String) document.get("rent"),
-                                        (boolean) document.get("heating"), (boolean) document.get("hydro"), (boolean) document.get("water"),
-                                        (String) document.get("landlord"), (String) document.get("manager"), (String) document.get("client"));
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
+                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
+                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
+                                        (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
+                                        (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
 
 
                                 // Populate the views with db_property data
@@ -143,52 +140,12 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                 // Set Buttons
                                 selectMgr.setText(db_property.getManager());
                                 selectClient.setText(db_property.getClient());
-
-                                // ending logic (subject to change)
-                                Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
-                                startActivityForResult(intent, 0);
-                                finish();
                             }
                         } else {
                             Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());
                         }
                     }
                 });
-
-        deleteProperty.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firestore.collection("properties")
-                        .whereEqualTo("address", propertyAddressDB)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        firestore.collection("properties").document(document.getId()).delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        // Document successfully deleted
-                                                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        // An error occurred
-                                                        Log.w("Firestore", "Error deleting document", e);
-                                                    }
-                                                });
-                                    }
-                                } else {
-                                    Log.d("Firestore", "Error getting documents: ", task.getException());
-                                }
-                            }
-                        });
-            }
-        });
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -255,5 +212,11 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
         // Required by the abstract class
+    }
+
+    public void onClickEditProperty(View view) {
+    }
+
+    public void onClickDeleteProperty(View view) {
     }
 }

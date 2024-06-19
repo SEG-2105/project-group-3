@@ -44,6 +44,7 @@ import ca.uottawa.team3.rentron.Users.UserCreator;
 
 public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     int selectedRole;
+    FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,8 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
+
+        firestore = FirebaseFirestore.getInstance();
 
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     }
 
     public void onClickAddUser(View view) {
-        UserCreator userCreator = new UserCreator(getApplicationContext());
+        UserCreator userCreator = new UserCreator(getApplicationContext(), firestore);
         User newUser;
 
         EditText emailField = (EditText)findViewById(R.id.editTextUsername);
@@ -146,39 +149,23 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
             return;
         }
 
-        // then, check if user already exists...
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        CollectionReference db = firestore.collection("users");
-        Task<QuerySnapshot> query = db.whereEqualTo("email", email).get();
-        while(!query.isComplete()); // hacky way to wrangle async. Firebase methods, should be changed
-        if (query.isSuccessful()) {
-            if (!query.getResult().isEmpty()) {
-                Toast.makeText(getApplicationContext(), "User already exists with the same email.", Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-
-        // password hash
-        Hashing hasher = new Hashing(getApplicationContext());
-        byte[] salt = hasher.generateSalt();
-        SecretKey password = hasher.hashPassword(passwordPlain.toCharArray(), salt);
-
         switch (selectedRole) {
             case 0: // client
-                newUser = new Client(firstName, lastName, email, password, salt, birthYear);
+                newUser = new Client(firstName, lastName, email, birthYear);
                 break;
             case 1: // landlord
-                newUser = new Landlord(firstName, lastName, email, password, salt, address);
+                newUser = new Landlord(firstName, lastName, email, address);
                 break;
             case 2: // property manager
-                newUser = new PropertyMgr(firstName, lastName, email, password, salt);
+                newUser = new PropertyMgr(firstName, lastName, email);
                 break;
             default:
-                // create invalid Client as "default" user, we should never be in this state though
-                newUser = new Client("","","",null, null, "");
+                newUser = new Client("","","",""); // create invalid Client as "default" user
+                // (we shouldn't be here ever)
+                Log.d("RegisterActivity:", "selectedRole spinner: Invalid state (default)!!");
         }
 
-        if (userCreator.add(newUser)) { // if registration successful
+        if (userCreator.add(newUser, passwordPlain)) { // if registration successful
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivityForResult(intent,0);
             finish();

@@ -59,4 +59,11 @@ public abstract class User { // encapsulates the user's HashMap (Firebase docume
     public Object getLastName() {
         return userData.get("lastname");
     }
+
+    public void setPassword(SecretKey pass, byte[] randomSalt) {
+        String encodedPassword = Base64.encodeToString(pass.getEncoded(), Base64.DEFAULT);
+        String encodedSalt = Base64.encodeToString(randomSalt, Base64.DEFAULT);
+        userData.put("password", encodedPassword);
+        userData.put("salt", encodedSalt);
+    }
 }

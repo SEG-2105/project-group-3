@@ -17,7 +17,7 @@ public class PropertyMgr extends User {
         userData.put("invitations", "");
     }
 
-    // constructor WITHOUT passwords (used when generating in-app user lists)
+    // constructor WITHOUT passwords (usually used when generating in-app user lists)
     public PropertyMgr(String firstName, String lastName, String email) {
         super(firstName, lastName, email);
         invitations = new ArrayList<String>();

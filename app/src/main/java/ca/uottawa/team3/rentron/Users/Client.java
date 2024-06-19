@@ -12,6 +12,14 @@ public class Client extends User { // least privileged type of user
         userData.put("role", "client");
     }
 
+    public Client(String firstName, String lastName, String email, String birthYear) {
+        super(firstName, lastName, email);
+        userData.put("birthyear", birthYear);
+        userData.put("role", "client");
+        userData.put("password", "");
+        userData.put("salt", "");
+    }
+
     public Object getBirthYear() {
         return this.userData.get("birthyear");
     }

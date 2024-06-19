@@ -51,7 +51,7 @@ public class Property {
         propertyData.put("client","");
     }
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager, String client) {
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, boolean heating, boolean hydro, boolean water, String landlord, String manager, String client) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -67,7 +67,11 @@ public class Property {
         propertyData.put("laundry", laundry);
         propertyData.put("numParkingSpot", numParkingSpot);
         propertyData.put("rent", rent);
-        propertyData.put("utilities", utilities);
+
+        propertyData.put("heating", heating);
+        propertyData.put("water", water);
+        propertyData.put("hydro", hydro);
+
         propertyData.put("landlord", landlord);
         propertyData.put("manager",manager);
         propertyData.put("client",client);
@@ -101,8 +105,14 @@ public class Property {
     public String getRent() {
         return this.propertyData.get("rent").toString();
     }
-    public String getUtilities() {
-        return this.propertyData.get("utilities").toString();
+    public String getHeating() {
+        return this.propertyData.get("heating").toString();
+    }
+    public String getHydro() {
+        return this.propertyData.get("hyrdro").toString();
+    }
+    public String getWater() {
+        return this.propertyData.get("water").toString();
     }
     public String getLandlord() {
         return this.propertyData.get("landlord").toString();
@@ -117,7 +127,7 @@ public class Property {
     public HashMap<String, Object> getPropertyData() { return this.propertyData; }
 
     public boolean isValid() {
-        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") ||  this.getUtilities().equals(""));
+        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") || this.getHeating().equals("") || this.getHydro().equals("") || this.getWater().equals(""));
     }
 }
 

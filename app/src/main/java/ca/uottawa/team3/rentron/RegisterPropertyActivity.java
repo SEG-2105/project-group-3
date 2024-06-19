@@ -57,10 +57,11 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
 
     Button selectMgr, register;
+    ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
+
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
-    ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
     @SuppressLint("MissingInflatedId")
     @Override

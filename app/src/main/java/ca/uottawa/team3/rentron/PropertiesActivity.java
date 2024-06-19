@@ -175,9 +175,14 @@ public class PropertiesActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Property property = properties.get(i);
-                Intent intent = new Intent(getApplicationContext(), EditPropertyActivity.class);
-                intent.putExtra("property", property.getAddress());
-                startActivityForResult(intent, 0);
+                if (email.equals(property.getLandlord()) || email.equals(property.getManager())) {
+                    Intent intent = new Intent(getApplicationContext(), EditPropertyActivity.class);
+                    intent.putExtra("property", property.getAddress());
+                    startActivityForResult(intent, 0);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Can't edit this property, you do not own/manage it.", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         });

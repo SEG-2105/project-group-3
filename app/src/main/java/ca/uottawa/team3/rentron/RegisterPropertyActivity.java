@@ -43,6 +43,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegisterPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -63,7 +64,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, selectClient, register;
+    Button selectMgr, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
@@ -92,7 +93,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         propertyLaundry = findViewById(R.id.propertyLaundry);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
-        selectClient = (Button)findViewById(R.id.propertyClient);
         register = (Button)findViewById(R.id.btnRegisterProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
@@ -184,7 +184,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
                 String landlord = activeEmail;  // Replace with actual landlord value
                 String manager = selectMgr.getText().toString();
-                String client = selectClient.getText().toString();
+                String client = ""; // blank for now, since client booking comes later
+
 
                 if (fieldCheck(
                         address, type, unit, floor, numRoom, numBathroom,

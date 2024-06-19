@@ -262,6 +262,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
             applyStrikethrough(propertyUnitLabel);
             removeStrikethrough(propertyNumFloorsLabel);
             propertyNumFloors.setText("");
+            propertyFloor.setText("");
+            propertyUnit.setText("");
         }
     }
 

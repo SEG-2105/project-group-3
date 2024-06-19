@@ -2,8 +2,11 @@ package ca.uottawa.team3.rentron;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,7 +32,7 @@ import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
 
-public class EditPropertyActivity extends AppCompatActivity {
+public class EditPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText
             propertyFloor,
             propertyUnit,
@@ -72,6 +75,9 @@ public class EditPropertyActivity extends AppCompatActivity {
         propertyUnit = findViewById(R.id.propertyUnit);
         propertyType = findViewById(R.id.propertyType);
         propertyLaundry = findViewById(R.id.propertyLaundry);
+
+        propertyType.setOnItemSelectedListener(this);
+        propertyLaundry.setOnItemSelectedListener(this);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
         selectClient = (Button)findViewById(R.id.propertyClient);
@@ -160,4 +166,46 @@ public class EditPropertyActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String selectedItem = parent.getItemAtPosition(position).toString();
+        if (selectedItem.equals("Apartment")) {
+            propertyFloor.setEnabled(true);
+            propertyUnit.setEnabled(true);
+            propertyNumFloors.setEnabled(false);
+            removeStrikethrough(propertyFloorLabel);
+            removeStrikethrough(propertyUnitLabel);
+            applyStrikethrough(propertyNumFloorsLabel);
+            propertyNumFloors.setText("1");
+        } else {
+            propertyFloor.setEnabled(false);
+            propertyUnit.setEnabled(false);
+            propertyNumFloors.setEnabled(true);
+            applyStrikethrough(propertyFloorLabel);
+            applyStrikethrough(propertyUnitLabel);
+            removeStrikethrough(propertyNumFloorsLabel);
+            propertyNumFloors.setText("");
+            propertyFloor.setText("");
+            propertyUnit.setText("");
+        }
+    }
+
+    private void applyStrikethrough(TextView textView) {
+        String text = textView.getText().toString();
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new StrikethroughSpan(), 0, text.length(), 0);
+        textView.setText(spannableString);
+    }
+
+    private void removeStrikethrough(TextView textView) {
+        textView.setText(textView.getText().toString());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+        // Required by the abstract class
+    }
+
 }

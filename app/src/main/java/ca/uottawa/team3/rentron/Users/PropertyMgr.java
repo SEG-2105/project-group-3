@@ -30,23 +30,27 @@ public class PropertyMgr extends User {
         userData.put("invitations", "");
     }
 
-    // check, add and remove invitations
+    // get, add, remove, and clear invitations list
     // WILL BE EXPANDED ON / USED IN LATER DELIVERABLES
     public List<String> getInvitations() {
         return this.invitations;
     }
 
     public void addInvitation(String propertyId) {
-        invitations.add(propertyId);
+        this.invitations.add(propertyId);
     }
 
     public boolean removeInvitation(String propertyId) {
         try {
-            invitations.remove(propertyId);
+            this.invitations.remove(propertyId);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void clearInvitations() {
+        this.invitations.clear();
     }
 
 }

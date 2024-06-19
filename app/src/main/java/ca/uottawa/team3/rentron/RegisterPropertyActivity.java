@@ -30,12 +30,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RegisterPropertyActivity extends AppCompatActivity {
 
     Button selectMgr, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
+    PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,24 @@ public class RegisterPropertyActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 fieldCheck();
+                Property property; // = new Property(...args...);
                 // add property registration logic here...
+
+                // basic invitation logic
+                String propertyId = ""; // this would be the unique Firebase document ID of the property
+                if (!Objects.isNull(propertyMgr)) {
+                    propertyMgr.addInvitation(propertyId);
+                }
+                else {
+                    // do nothing...?
+                }
+                // clear selected PropertyMgr's invitation list since, for now, all invitations are automatically accepted
+                propertyMgr.clearInvitations();
+
+                // ending logic (subject to change)
+                Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                startActivityForResult(intent, 0);
+                finish();
             }
         });
     }
@@ -126,7 +145,7 @@ public class RegisterPropertyActivity extends AppCompatActivity {
         propertyMgrListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                PropertyMgr propertyMgr = propertyMgrList.get(i);
+                propertyMgr = propertyMgrList.get(i);
                 selectMgr.setText(propertyMgr.getFirstName() + " " + propertyMgr.getLastName());
                 b.dismiss();
             }

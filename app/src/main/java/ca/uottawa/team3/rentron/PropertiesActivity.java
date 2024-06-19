@@ -132,7 +132,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                         properties.add(db_property);
                                     }
                                 } else {
-                                    if (db_property.getClient().isEmpty()){
+                                    if (db_property.getClient().isEmpty() && !db_property.getLandlord().isEmpty()){
                                         properties.add(db_property);
                                     }
                                 }

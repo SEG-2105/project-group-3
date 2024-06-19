@@ -165,13 +165,9 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 String laundry = propertyLaundry.getSelectedItem().toString();
                 String numParkingSpot = propertyParking.getText().toString();
                 String rent = propertyRent.getText().toString();
-
-                // Compile utilities into a comma-separated string
-                StringBuilder utilitiesBuilder = new StringBuilder();
-                if (propertyHydro.isChecked()) utilitiesBuilder.append("Hydro,");
-                if (propertyHeating.isChecked()) utilitiesBuilder.append("Heating,");
-                if (propertyWater.isChecked()) utilitiesBuilder.append("Water,");
-                String utilities = utilitiesBuilder.toString();
+                boolean hydro = propertyHydro.isChecked();
+                boolean heating = propertyHeating.isChecked();
+                boolean water = propertyWater.isChecked();
 
                 SharedPreferences pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
 
@@ -192,7 +188,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 if (fieldCheck(
                         address, type, floor, numRoom, numBathroom,
                         numFloor, area, laundry, numParkingSpot,
-                        rent, utilities, landlord, manager, client)
+                        rent, landlord, manager, client)
                 ) {
 //                    Property property; // = new Property(...args...);
 //                    PropertyMgr manager; // = new PropertyMgr(...args...);
@@ -209,7 +205,9 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                             laundry,
                             numParkingSpot,
                             rent,
-                            utilities,
+                            heating,
+                            hydro,
+                            water,
                             landlord,
                             manager,
                             client
@@ -285,7 +283,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private boolean fieldCheck(
             String address, String type, String floor, String numRoom, String numBathroom,
             String numFloor, String area, String laundry, String numParkingSpot,
-            String rent, String utilities, String landlord, String manager, String client) {
+            String rent, String landlord, String manager, String client) {
 
         // field checking logic goes here...
         return true;

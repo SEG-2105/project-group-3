@@ -1,7 +1,6 @@
-package ca.uottawa.team3.rentron.Users;
+package ca.uottawa.team3.rentron.Properties;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Property {
 

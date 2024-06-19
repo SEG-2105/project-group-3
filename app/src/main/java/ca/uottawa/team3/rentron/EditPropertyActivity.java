@@ -329,4 +329,14 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             }
         });
     }
+
+    private boolean fieldCheck(
+            String address, String type, String unit, String floor, String numRoom, String numBathroom,
+            String numFloor, String area, String laundry, String numParkingSpot,
+            String rent, String landlord, String manager, String client) {
+
+        // field checking logic goes here...
+        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty() || landlord.isEmpty() || manager.isEmpty() || client.isEmpty());
+    }
+
 }

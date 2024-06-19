@@ -291,7 +291,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
             String rent, String landlord, String manager, String client) {
 
         // field checking logic goes here...
-        return true;
+        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty() || landlord.isEmpty() || manager.isEmpty() || client.isEmpty());
     }
 
     private void showPropertyMgrDialog(FirebaseFirestore db) {

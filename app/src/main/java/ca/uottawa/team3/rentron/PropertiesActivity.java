@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -170,6 +171,16 @@ public class PropertiesActivity extends AppCompatActivity {
             }
         });
 
+        listViewProperties.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Property property = properties.get(i);
+                Intent intent = new Intent(getApplicationContext(), EditPropertyActivity.class);
+                intent.putExtra("property", property.getAddress());
+                startActivityForResult(intent, 0);
+                return true;
+            }
+        });
     }
 
     @Override

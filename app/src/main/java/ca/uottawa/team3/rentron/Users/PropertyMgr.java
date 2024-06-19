@@ -15,19 +15,21 @@ public class PropertyMgr extends User {
 
     public PropertyMgr(String firstName, String lastName, String email, SecretKey password, byte[] salt) {
         super(firstName, lastName, email, password, salt);
+        invitations = new ArrayList<String>();
+        userData.put("role", "property-manager");
+        userData.put("invitations", "");
+    }
+
+    // constructor WITHOUT passwords (used when generating in-app user lists)
+    public PropertyMgr(String firstName, String lastName, String email) {
+        super(firstName, lastName, email);
+        invitations = new ArrayList<String>();
         userData.put("role", "property-manager");
         userData.put("invitations", "");
     }
 
     public boolean isValid() {
         return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || Objects.isNull(this.getPassword()) || this.getRole().equals(""));
-    }
-
-    // constructor WITHOUT passwords (used when generating in-app user lists)
-    public PropertyMgr(String firstName, String lastName, String email) {
-        super(firstName, lastName, email);
-        userData.put("role", "property-manager");
-        userData.put("invitations", "");
     }
 
     // get, add, remove, and clear invitations list
@@ -49,8 +51,13 @@ public class PropertyMgr extends User {
         }
     }
 
-    public void clearInvitations() {
-        this.invitations.clear();
+    public boolean clearInvitations() {
+        try {
+            this.invitations.clear();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

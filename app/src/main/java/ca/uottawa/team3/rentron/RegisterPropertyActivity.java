@@ -2,15 +2,20 @@ package ca.uottawa.team3.rentron;
 
 import ca.uottawa.team3.rentron.Users.*;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -32,18 +37,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RegisterPropertyActivity extends AppCompatActivity {
+public class RegisterPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    private EditText propertyFloor, propertyUnit, propertyNumFloors;
+    private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
     Button selectMgr, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
+    ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register_property);
+
+        propertyFloor = findViewById(R.id.propertyFloor);
+        propertyUnit = findViewById(R.id.propertyUnit);
+        propertyNumFloors = findViewById(R.id.propertyNumFloors);
+
+        propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
+        propertyUnitLabel = findViewById(R.id.propertyUnitLabel);
+        propertyNumFloorsLabel = findViewById(R.id.propertyNumFloorsLabel);
+
+        // =============== Populating the Spinners ===============
+        // Initialize Spinner
+        Spinner propertyTypeSpinner = findViewById(R.id.propertyType);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        // The array can be found under res/values/array.xml
+       propertyTypeAdapter = ArrayAdapter.createFromResource(this,
+                R.array.propertyTypeArray, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        propertyTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        propertyTypeSpinner.setAdapter(propertyTypeAdapter);
+
+        // Populate the laundry spinner the same way but use it's array
+        Spinner propertyLaundrySpinner = findViewById(R.id.propertyLaundry);
+        propertyLaundryAdapter = ArrayAdapter.createFromResource(this,
+                R.array.propertyLaundryArray, android.R.layout.simple_spinner_item);
+        propertyLaundryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        propertyLaundrySpinner.setAdapter(propertyLaundryAdapter);
+
+        propertyTypeSpinner.setOnItemSelectedListener(this);
+        propertyLaundrySpinner.setOnItemSelectedListener(this);
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -104,6 +144,45 @@ public class RegisterPropertyActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String selectedItem = parent.getItemAtPosition(position).toString();
+        if (selectedItem.equals("Apartment")) {
+            propertyFloor.setEnabled(true);
+            propertyUnit.setEnabled(true);
+            propertyNumFloors.setEnabled(false);
+            removeStrikethrough(propertyFloorLabel);
+            removeStrikethrough(propertyUnitLabel);
+            applyStrikethrough(propertyNumFloorsLabel);
+            propertyNumFloors.setText("1");
+        } else {
+            propertyFloor.setEnabled(false);
+            propertyUnit.setEnabled(false);
+            propertyNumFloors.setEnabled(true);
+            applyStrikethrough(propertyFloorLabel);
+            applyStrikethrough(propertyUnitLabel);
+            removeStrikethrough(propertyNumFloorsLabel);
+            propertyNumFloors.setText("");
+        }
+    }
+
+    private void applyStrikethrough(TextView textView) {
+        String text = textView.getText().toString();
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new StrikethroughSpan(), 0, text.length(), 0);
+        textView.setText(spannableString);
+    }
+
+    private void removeStrikethrough(TextView textView) {
+        textView.setText(textView.getText().toString());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+        // Required by the abstract class
     }
 
     private void fieldCheck() {

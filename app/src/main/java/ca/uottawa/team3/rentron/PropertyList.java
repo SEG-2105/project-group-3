@@ -51,7 +51,6 @@ public class PropertyList  extends ArrayAdapter<Property> {
         parking.setText(property.getNumParkingSpot());
         rent.setText(property.getRent());
         utilities.setText(property.getUtilities());
-        Toast.makeText(context, "Instantiated list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;
     }
 

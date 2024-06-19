@@ -440,6 +440,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onClickEditProperty"
             android:text="Edit Property" />
 
         <Button
@@ -448,6 +449,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@color/red"
+            android:onClick="onClickDeleteProperty"
             android:text="Delete Property" />
 
     </LinearLayout>

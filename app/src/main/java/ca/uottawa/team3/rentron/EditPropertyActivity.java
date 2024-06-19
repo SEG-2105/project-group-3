@@ -23,6 +23,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -50,7 +52,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, edit, selectClient;
+    Button selectMgr, edit, selectClient, deleteProperty;
     ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
     FirebaseFirestore firestore;
@@ -83,6 +85,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         selectClient = (Button)findViewById(R.id.propertyClient);
 
         edit = (Button)findViewById(R.id.btnEditProperty);
+        deleteProperty = (Button)findViewById(R.id.btnDeleteProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
         propertyUnitLabel = findViewById(R.id.propertyUnitLabel);
@@ -146,6 +149,41 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                         }
                     }
                 });
+
+        deleteProperty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firestore.collection("properties")
+                        .whereEqualTo("address", propertyAddressDB)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        firestore.collection("properties").document(document.getId()).delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Document successfully deleted
+                                                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        // An error occurred
+                                                        Log.w("Firestore", "Error deleting document", e);
+                                                    }
+                                                });
+                                    }
+                                } else {
+                                    Log.d("Firestore", "Error getting documents: ", task.getException());
+                                }
+                            }
+                        });
+            }
+        });
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);

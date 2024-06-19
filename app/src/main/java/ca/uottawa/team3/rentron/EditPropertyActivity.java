@@ -170,6 +170,13 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectedItem = parent.getItemAtPosition(position).toString();
+
+        if (parent.getId() == R.id.propertyType) {
+            applyPropertyTypeRules(selectedItem);
+        }
+    }
+
+    private void applyPropertyTypeRules(String selectedItem) {
         if (selectedItem.equals("Apartment")) {
             propertyFloor.setEnabled(true);
             propertyUnit.setEnabled(true);
@@ -190,7 +197,6 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             propertyUnit.setText("");
         }
     }
-
     private void applyStrikethrough(TextView textView) {
         String text = textView.getText().toString();
         SpannableString spannableString = new SpannableString(text);

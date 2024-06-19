@@ -1,7 +1,9 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -35,7 +38,8 @@ public class EditPropertyActivity extends AppCompatActivity {
             propertyBathrooms,
             propertyArea,
             propertyParking,
-            propertyRent;
+            propertyRent,
+            propertyAddress;
 
     private CheckBox propertyHydro, propertyHeating, propertyWater;
 
@@ -54,6 +58,7 @@ public class EditPropertyActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_property);
 
+        propertyAddress = findViewById(R.id.propertyAddress);
         propertyFloor = findViewById(R.id.propertyFloor);
         propertyBedrooms = findViewById(R.id.propertyBedrooms);
         propertyBathrooms = findViewById(R.id.propertyBathrooms);
@@ -77,25 +82,26 @@ public class EditPropertyActivity extends AppCompatActivity {
         propertyUnitLabel = findViewById(R.id.propertyUnitLabel);
         propertyNumFloorsLabel = findViewById(R.id.propertyNumFloorsLabel);
 
-        String propertyAddress = getIntent().getStringExtra("property");
+        String propertyAddressDB = getIntent().getStringExtra("property");
         firestore = FirebaseFirestore.getInstance();
 
         firestore.collection("properties")
-                .whereEqualTo("address", propertyAddress)
+                .whereEqualTo("address", propertyAddressDB)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"), (String)document.get("unit"),
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
-                                        (boolean)document.get("heating"), (boolean)document.get("water"), (boolean)document.get("hydro"),
+                                        (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
                                         (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
 
 
                                 // Populate the views with db_property data
+                                propertyAddress.setText(db_property.getAddress());
                                 propertyNumFloors.setText(db_property.getNumFloor());
                                 propertyBedrooms.setText(db_property.getNumRoom());
                                 propertyBathrooms.setText(db_property.getNumBathroom());
@@ -109,23 +115,21 @@ public class EditPropertyActivity extends AppCompatActivity {
                                 ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(EditPropertyActivity.this, R.array.propertyTypeArray, android.R.layout.simple_spinner_item);
                                 typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 propertyType.setAdapter(typeAdapter);
-                                if (db_property.getType() != null) {
-                                    int typePosition = typeAdapter.getPosition(db_property.getType());
-                                    propertyType.setSelection(typePosition);
-                                }
+
+                                int typePosition = typeAdapter.getPosition(db_property.getType());
+                                propertyType.setSelection(typePosition);
 
                                 ArrayAdapter<CharSequence> laundryAdapter = ArrayAdapter.createFromResource(EditPropertyActivity.this, R.array.propertyLaundryArray, android.R.layout.simple_spinner_item);
                                 laundryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 propertyLaundry.setAdapter(laundryAdapter);
-                                if (db_property.getLaundry() != null) {
-                                    int laundryPosition = laundryAdapter.getPosition(db_property.getLaundry());
-                                    propertyLaundry.setSelection(laundryPosition);
-                                }
+
+                                int laundryPosition = laundryAdapter.getPosition(db_property.getLaundry());
+                                propertyLaundry.setSelection(laundryPosition);
 
                                 // Set CheckBoxes
-                                propertyHydro.setChecked(Objects.equals(db_property.getHydro(), "true"));
-                                propertyHeating.setChecked(Objects.equals(db_property.getHeating(), "true"));
-                                propertyWater.setChecked(Objects.equals(db_property.getWater(), "true"));
+                                propertyHydro.setChecked(db_property.getHydro());
+                                propertyHeating.setChecked(db_property.getHeating());
+                                propertyWater.setChecked(db_property.getWater());
 
                                 // Set Buttons
                                 selectMgr.setText(db_property.getManager());
@@ -136,6 +140,19 @@ public class EditPropertyActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        Toolbar topBar = findViewById(R.id.topBar);
+        setSupportActionBar(topBar);
+
+        topBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                startActivityForResult (intent,0);
+                finish();
+            }
+        });
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

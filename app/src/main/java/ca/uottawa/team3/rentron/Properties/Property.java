@@ -54,7 +54,7 @@ public class Property {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
-        if ("apartment".equals(propertyData.get("type"))) {
+        if ("Apartment".equals(propertyData.get("type"))) {
             propertyData.put("floor", floor);
         } else {
             propertyData.put("floor", "N/A");

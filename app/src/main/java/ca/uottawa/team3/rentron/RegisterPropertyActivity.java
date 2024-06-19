@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -29,7 +30,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -56,7 +60,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, register;
+    Button selectMgr, register, selectClient;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
@@ -68,6 +72,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register_property);
+
+        firestore = FirebaseFirestore.getInstance();
 
         propertyAddress = findViewById(R.id.propertyAddress);
         propertyFloor = findViewById(R.id.propertyFloor);
@@ -85,6 +91,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         propertyLaundry = findViewById(R.id.propertyLaundry);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
+        selectClient = (Button)findViewById(R.id.propertyClient);
         register = (Button)findViewById(R.id.btnRegisterProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
@@ -135,8 +142,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     public void onStart() {
         super.onStart();
 
-        firestore = FirebaseFirestore.getInstance();
-
         selectMgr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,22 +184,30 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 //                    Landlord landlord; // = new Landlord(...args...);
 
                     Property property = new Property(
-                            address,
-                            type,
-                            floor,
-                            numRoom,
-                            numBathroom,
-                            numFloor,
-                            area,
-                            laundry,
-                            numParkingSpot,
-                            rent,
-                            utilities,
-                            landlord,
-                            manager,
-                            client
+                        address,
+                        type,
+                        floor,
+                        numRoom,
+                        numBathroom,
+                        numFloor,
+                        area,
+                        laundry,
+                        numParkingSpot,
+                        rent,
+                        utilities,
+                        landlord,
+                        manager,
+                        client
                     );
 
+                    firestore.collection("properties")
+                            .add(property.getPropertyData())
+                            .addOnSuccessListener(documentReference -> {
+                                Toast.makeText(RegisterPropertyActivity.this, "Property Registered Successfully", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(RegisterPropertyActivity.this, "Error registering property: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                     // add property registration logic here...
                     // along with something like:
                     /*
@@ -206,7 +219,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     // invitation logic
                     //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
                     //inviteHandler.sendInviteToManager();
-
 
                     // ending logic (subject to change)
                     Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);

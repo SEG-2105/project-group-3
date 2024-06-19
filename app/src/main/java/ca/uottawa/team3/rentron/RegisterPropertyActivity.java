@@ -1,12 +1,17 @@
 package ca.uottawa.team3.rentron;
 
+import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Properties.PropertyCreator;
 import ca.uottawa.team3.rentron.Users.*;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.StrikethroughSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -34,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,12 +63,11 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, register;
-    ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
-
+    Button selectMgr, selectClient, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
+    ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -86,6 +92,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         propertyLaundry = findViewById(R.id.propertyLaundry);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
+        selectClient = (Button)findViewById(R.id.propertyClient);
         register = (Button)findViewById(R.id.btnRegisterProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
@@ -166,9 +173,21 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 if (propertyWater.isChecked()) utilitiesBuilder.append("Water,");
                 String utilities = utilitiesBuilder.toString();
 
-                String landlord = "SomeLandlord";  // Replace with actual landlord value
+                SharedPreferences pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
+
+                // get active landlord's email
+                byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+
+                String activeEmail = "";
+                try {
+                    activeEmail = new String(active, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                String landlord = activeEmail;  // Replace with actual landlord value
                 String manager = selectMgr.getText().toString();
-                String client = register.getText().toString();
+                String client = selectClient.getText().toString();
 
                 if (fieldCheck(
                         address, type, floor, numRoom, numBathroom,
@@ -197,23 +216,28 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     );
 
                     // add property registration logic here...
+                    PropertyCreator creator = new PropertyCreator(getApplicationContext(), firestore);
+                    if (creator.add(property)) { // if addition successful
+                        // invitation logic
+                        //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
+                        //inviteHandler.sendInviteToManager();
 
-                    // invitation logic
-                    //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
-                    //inviteHandler.sendInviteToManager();
-
-                    // append to invitation logic something like:
+                        // append to invitation logic something like:
                     /*
                         if(!Objects.isNull(manager)) {
                             ...manually add manager to property's Firebase document... (since we are assuming invites are automatically accepted)
                         }
                      */
 
+                        // ending logic (subject to change)
+                        Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                        startActivityForResult(intent, 0);
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Could not register property.", Toast.LENGTH_LONG).show();
+                    }
 
-                    // ending logic (subject to change)
-                    Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
-                    startActivityForResult(intent, 0);
-                    finish();
                 }
             }
         });

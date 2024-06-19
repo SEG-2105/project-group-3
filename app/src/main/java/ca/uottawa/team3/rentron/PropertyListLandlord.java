@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ca.uottawa.team3.rentron.Users.Property;
+import ca.uottawa.team3.rentron.Properties.Property;
 
 public class PropertyListLandlord extends ArrayAdapter<Property> {
 
@@ -47,14 +47,22 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         type.setText(property.getType());
         String floorString = "Floor: "+property.getFloor();
         floor.setText(floorString);
-        numRooms.setText(property.getNumRoom());
-        numBathrooms.setText(property.getNumBathroom());
-        numFloors.setText(property.getNumFloor());
-        area.setText(property.getArea());
-        laundry.setText((property.getLaundry()));
-        parking.setText(property.getNumParkingSpot());
-        rent.setText(property.getRent());
-        utilities.setText(property.getUtilities());
+        String numRoom = "Number of Rooms:"+property.getNumRoom();
+        numRooms.setText(numRoom);
+        String numBathroom = "Number of Bathrooms:"+property.getNumBathroom();
+        numBathrooms.setText(numBathroom);
+        String numFloor = "Number of Floors:"+property.getNumFloor();
+        numFloors.setText(numFloor);
+        String area1 = "Area:"+property.getArea()+" s.q. ft";
+        area.setText(area1);
+        String laundry1 = "Laundry:"+property.getLaundry();
+        laundry.setText(laundry1);
+        String numParkingSpot = "Number of Parking spots:"+property.getNumParkingSpot();
+        parking.setText(numParkingSpot);
+        String rent1 = "Rent:$"+property.getRent()+"/month";
+        rent.setText(rent1);
+        String utilities1 = "Utilities:"+property.getUtilities();
+        utilities.setText(utilities1);
         if (property.getManager().isEmpty()){
             manager.setText("No Manager");
         } else {

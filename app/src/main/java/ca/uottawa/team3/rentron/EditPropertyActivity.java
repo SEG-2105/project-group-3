@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import ca.uottawa.team3.rentron.Users.Property;
+import ca.uottawa.team3.rentron.Properties.Property;
 
 public class EditPropertyActivity extends AppCompatActivity {
     private EditText

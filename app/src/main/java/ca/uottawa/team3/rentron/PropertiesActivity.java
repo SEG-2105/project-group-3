@@ -33,7 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.uottawa.team3.rentron.Users.Property;
+import ca.uottawa.team3.rentron.Properties.Property;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;

@@ -157,6 +157,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
                 String address = propertyAddress.getText().toString();
                 String type = propertyType.getSelectedItem().toString();
+                String unit = propertyUnit.getText().toString();
                 String floor = propertyFloor.getText().toString();
                 String numRoom = propertyBedrooms.getText().toString();
                 String numBathroom = propertyBathrooms.getText().toString();
@@ -186,7 +187,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 String client = selectClient.getText().toString();
 
                 if (fieldCheck(
-                        address, type, floor, numRoom, numBathroom,
+                        address, type, unit, floor, numRoom, numBathroom,
                         numFloor, area, laundry, numParkingSpot,
                         rent, landlord, manager, client)
                 ) {
@@ -197,6 +198,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     Property property = new Property(
                             address,
                             type,
+                            unit,
                             floor,
                             numRoom,
                             numBathroom,
@@ -281,7 +283,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     }
 
     private boolean fieldCheck(
-            String address, String type, String floor, String numRoom, String numBathroom,
+            String address, String type, String unit, String floor, String numRoom, String numBathroom,
             String numFloor, String area, String laundry, String numParkingSpot,
             String rent, String landlord, String manager, String client) {
 

@@ -31,7 +31,6 @@ public class EditPropertyActivity extends AppCompatActivity {
             propertyFloor,
             propertyUnit,
             propertyNumFloors,
-            propertyAddress,
             propertyBedrooms,
             propertyBathrooms,
             propertyArea,
@@ -55,7 +54,6 @@ public class EditPropertyActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_property);
 
-        propertyAddress = findViewById(R.id.propertyAddress);
         propertyFloor = findViewById(R.id.propertyFloor);
         propertyBedrooms = findViewById(R.id.propertyBedrooms);
         propertyBathrooms = findViewById(R.id.propertyBathrooms);
@@ -90,7 +88,7 @@ public class EditPropertyActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"), (String)document.get("unit"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
                                         (boolean)document.get("heating"), (boolean)document.get("water"), (boolean)document.get("hydro"),
@@ -98,7 +96,6 @@ public class EditPropertyActivity extends AppCompatActivity {
 
 
                                 // Populate the views with db_property data
-                                propertyAddress.setText(db_property.getAddress());
                                 propertyNumFloors.setText(db_property.getNumFloor());
                                 propertyBedrooms.setText(db_property.getNumRoom());
                                 propertyBathrooms.setText(db_property.getNumBathroom());
@@ -109,7 +106,7 @@ public class EditPropertyActivity extends AppCompatActivity {
                                 propertyRent.setText(db_property.getRent());
 
                                 // Populate Spinners with values
-                                ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this, R.array.property_types, android.R.layout.simple_spinner_item);
+                                ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(EditPropertyActivity.this, R.array.propertyTypeArray, android.R.layout.simple_spinner_item);
                                 typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 propertyType.setAdapter(typeAdapter);
                                 if (db_property.getType() != null) {
@@ -117,7 +114,7 @@ public class EditPropertyActivity extends AppCompatActivity {
                                     propertyType.setSelection(typePosition);
                                 }
 
-                                ArrayAdapter<CharSequence> laundryAdapter = ArrayAdapter.createFromResource(this, R.array.laundry_options, android.R.layout.simple_spinner_item);
+                                ArrayAdapter<CharSequence> laundryAdapter = ArrayAdapter.createFromResource(EditPropertyActivity.this, R.array.propertyLaundryArray, android.R.layout.simple_spinner_item);
                                 laundryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 propertyLaundry.setAdapter(laundryAdapter);
                                 if (db_property.getLaundry() != null) {
@@ -133,7 +130,6 @@ public class EditPropertyActivity extends AppCompatActivity {
                                 // Set Buttons
                                 selectMgr.setText(db_property.getManager());
                                 selectClient.setText(db_property.getClient());
-                            }
                             }
                         } else {
                             Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());

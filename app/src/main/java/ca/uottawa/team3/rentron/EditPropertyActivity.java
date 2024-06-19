@@ -214,4 +214,9 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         // Required by the abstract class
     }
 
+    public void onClickEditProperty(View view) {
+    }
+
+    public void onClickDeleteProperty(View view) {
+    }
 }

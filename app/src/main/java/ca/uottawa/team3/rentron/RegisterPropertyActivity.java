@@ -196,16 +196,17 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     );
 
                     // add property registration logic here...
-                    // along with something like:
-                    /*
-                        if(!Objects.isNull(manager)) {
-                            ...manually add manager to property's Firebase document...
-                        }
-                     */
 
                     // invitation logic
                     //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
                     //inviteHandler.sendInviteToManager();
+
+                    // append to invitation logic something like:
+                    /*
+                        if(!Objects.isNull(manager)) {
+                            ...manually add manager to property's Firebase document... (since we are assuming invites are automatically accepted)
+                        }
+                     */
 
 
                     // ending logic (subject to change)

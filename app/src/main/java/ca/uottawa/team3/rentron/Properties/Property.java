@@ -108,14 +108,14 @@ public class Property {
     public String getRent() {
         return this.propertyData.get("rent").toString();
     }
-    public String getHeating() {
-        return this.propertyData.get("heating").toString();
+    public boolean getHeating() {
+        return Boolean.parseBoolean(this.propertyData.get("heating").toString());
     }
-    public String getHydro() {
-        return this.propertyData.get("hyrdro").toString();
+    public boolean getHydro() {
+        return Boolean.parseBoolean(this.propertyData.get("hydro").toString());
     }
-    public String getWater() {
-        return this.propertyData.get("water").toString();
+    public boolean getWater() {
+        return Boolean.parseBoolean(this.propertyData.get("water").toString());
     }
     public String getLandlord() {
         return this.propertyData.get("landlord").toString();
@@ -130,7 +130,7 @@ public class Property {
     public HashMap<String, Object> getPropertyData() { return this.propertyData; }
 
     public boolean isValid() {
-        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") && this.getUnit().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") || this.getHeating().equals("") || this.getHydro().equals("") || this.getWater().equals(""));
+        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("")); // || this.getHeating() || this.getHydro() || this.getWater()
     }
 }
 

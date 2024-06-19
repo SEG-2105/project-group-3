@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
@@ -42,7 +43,7 @@ public class PropertyList  extends ArrayAdapter<Property> {
         Property property = properties.get(position);
         address.setText(property.getAddress());
         type.setText(property.getType());
-        String floorString = "Floor: "+property.getFloor();
+        String floorString = "Floor: "+property.getFloor() + " Unit: "+property.getUnit();
         floor.setText(floorString);
         String numRoom = "Number of Rooms:"+property.getNumRoom();
         numRooms.setText(numRoom);
@@ -58,8 +59,23 @@ public class PropertyList  extends ArrayAdapter<Property> {
         parking.setText(numParkingSpot);
         String rent1 = "Rent:$"+property.getRent()+"/month";
         rent.setText(rent1);
-        String utilities1 = "Utilities:"+property.getUtilities();
-        utilities.setText(utilities1);
+
+        String utilities1 = "Utilities:";
+        if (property.getHeating()) {
+            utilities1 += ("Heating, ");
+        }
+        if (property.getHydro()) {
+            utilities1 += ("Hydro, ");
+        }
+        if (property.getWater()) {
+            utilities1 += ("Water, ");
+        }
+        if (property.getHeating() || property.getHydro() || property.getWater()) {
+            utilities.setText(utilities1.substring(0, utilities1.length() - 2));
+        } else {
+            utilities.setText("No Utilities");
+        }
+
         return listViewItem;
     }
 

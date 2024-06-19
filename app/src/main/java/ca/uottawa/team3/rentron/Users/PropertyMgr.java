@@ -6,13 +6,15 @@ import java.util.Objects;
 
 import javax.crypto.SecretKey;
 
+import ca.uottawa.team3.rentron.Users.Invitations.Invitation;
+
 public class PropertyMgr extends User {
     // WILL BE EXPANDED ON / USED IN LATER DELIVERABLES
-    private ArrayList<String> invitations;
+    private ArrayList<Invitation> invitations;
 
     public PropertyMgr(String firstName, String lastName, String email, SecretKey password, byte[] salt) {
         super(firstName, lastName, email, password, salt);
-        invitations = new ArrayList<String>();
+        invitations = new ArrayList<Invitation>();
         userData.put("role", "property-manager");
         userData.put("invitations", "");
     }
@@ -20,7 +22,7 @@ public class PropertyMgr extends User {
     // constructor WITHOUT passwords (usually used when generating in-app user lists)
     public PropertyMgr(String firstName, String lastName, String email) {
         super(firstName, lastName, email);
-        invitations = new ArrayList<String>();
+        invitations = new ArrayList<Invitation>();
         userData.put("role", "property-manager");
         userData.put("invitations", "");
     }
@@ -31,17 +33,17 @@ public class PropertyMgr extends User {
 
     // get, add, remove, and clear invitations list
     // WILL BE EXPANDED ON / USED IN LATER DELIVERABLES
-    public List<String> getInvitations() {
+    public List<Invitation> getInvitations() {
         return this.invitations;
     }
 
-    public void addInvitation(String propertyId) {
-        this.invitations.add(propertyId);
+    public void addInvitation(Invitation invite) {
+        this.invitations.add(invite);
     }
 
-    public boolean removeInvitation(String propertyId) {
+    public boolean removeInvitation(Invitation invite) {
         try {
-            this.invitations.remove(propertyId);
+            this.invitations.remove(invite);
             return true;
         } catch (Exception e) {
             return false;

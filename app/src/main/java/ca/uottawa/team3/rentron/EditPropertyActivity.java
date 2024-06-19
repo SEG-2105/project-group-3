@@ -173,6 +173,9 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                                     public void onSuccess(Void aVoid) {
                                                         // Document successfully deleted
                                                         Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                                                        Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                                                        startActivityForResult(intent, 0);
+                                                        finish();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {

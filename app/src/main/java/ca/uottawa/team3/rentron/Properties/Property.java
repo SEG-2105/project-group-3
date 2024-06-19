@@ -50,7 +50,7 @@ public class Property {
         propertyData.put("client","");
     }
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, boolean heating, boolean hydro, boolean water, String landlord, String manager, String client) {
+    public Property(String address, String type, String unit, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, boolean heating, boolean hydro, boolean water, String landlord, String manager, String client) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -62,6 +62,7 @@ public class Property {
         propertyData.put("numRoom", numRoom);
         propertyData.put("numBathroom", numBathroom);
         propertyData.put("numFloor", numFloor);
+        propertyData.put("unit", unit);
         propertyData.put("area", area);
         propertyData.put("laundry", laundry);
         propertyData.put("numParkingSpot", numParkingSpot);
@@ -93,6 +94,9 @@ public class Property {
     }
     public String getNumFloor() {
         return this.propertyData.get("numFloor").toString();
+    }
+    public String getUnit() {
+        return this.propertyData.get("unit").toString();
     }
     public String getArea() {
         return this.propertyData.get("area").toString();
@@ -126,7 +130,7 @@ public class Property {
     public HashMap<String, Object> getPropertyData() { return this.propertyData; }
 
     public boolean isValid() {
-        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") || this.getHeating().equals("") || this.getHydro().equals("") || this.getWater().equals(""));
+        return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") && this.getUnit().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") || this.getHeating().equals("") || this.getHydro().equals("") || this.getWater().equals(""));
     }
 }
 

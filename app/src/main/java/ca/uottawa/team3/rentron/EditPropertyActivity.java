@@ -22,6 +22,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Objects;
+
 import ca.uottawa.team3.rentron.Properties.Property;
 
 public class EditPropertyActivity extends AppCompatActivity {
@@ -42,7 +44,7 @@ public class EditPropertyActivity extends AppCompatActivity {
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, edit;
+    Button selectMgr, edit, selectClient;
     ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
 
     FirebaseFirestore firestore;
@@ -69,6 +71,8 @@ public class EditPropertyActivity extends AppCompatActivity {
         propertyLaundry = findViewById(R.id.propertyLaundry);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
+        selectClient = (Button)findViewById(R.id.propertyClient);
+
         edit = (Button)findViewById(R.id.btnEditProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
@@ -91,6 +95,45 @@ public class EditPropertyActivity extends AppCompatActivity {
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
                                         (boolean)document.get("heating"), (boolean)document.get("water"), (boolean)document.get("hydro"),
                                         (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
+
+
+                                // Populate the views with db_property data
+                                propertyAddress.setText(db_property.getAddress());
+                                propertyNumFloors.setText(db_property.getNumFloor());
+                                propertyBedrooms.setText(db_property.getNumRoom());
+                                propertyBathrooms.setText(db_property.getNumBathroom());
+                                propertyArea.setText(db_property.getArea());
+                                propertyParking.setText(db_property.getNumParkingSpot());
+                                propertyFloor.setText(db_property.getFloor());
+                                propertyUnit.setText(db_property.getUnit());
+                                propertyRent.setText(db_property.getRent());
+
+                                // Populate Spinners with values
+                                ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this, R.array.property_types, android.R.layout.simple_spinner_item);
+                                typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                propertyType.setAdapter(typeAdapter);
+                                if (db_property.getType() != null) {
+                                    int typePosition = typeAdapter.getPosition(db_property.getType());
+                                    propertyType.setSelection(typePosition);
+                                }
+
+                                ArrayAdapter<CharSequence> laundryAdapter = ArrayAdapter.createFromResource(this, R.array.laundry_options, android.R.layout.simple_spinner_item);
+                                laundryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                propertyLaundry.setAdapter(laundryAdapter);
+                                if (db_property.getLaundry() != null) {
+                                    int laundryPosition = laundryAdapter.getPosition(db_property.getLaundry());
+                                    propertyLaundry.setSelection(laundryPosition);
+                                }
+
+                                // Set CheckBoxes
+                                propertyHydro.setChecked(Objects.equals(db_property.getHydro(), "true"));
+                                propertyHeating.setChecked(Objects.equals(db_property.getHeating(), "true"));
+                                propertyWater.setChecked(Objects.equals(db_property.getWater(), "true"));
+
+                                // Set Buttons
+                                selectMgr.setText(db_property.getManager());
+                                selectClient.setText(db_property.getClient());
+                            }
                             }
                         } else {
                             Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());

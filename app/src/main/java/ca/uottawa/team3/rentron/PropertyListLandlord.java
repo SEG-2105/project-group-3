@@ -46,7 +46,7 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         Property property = properties.get(position);
         address.setText(property.getAddress());
         type.setText(property.getType());
-        String floorString = "Floor: "+property.getFloor();
+        String floorString = "Floor: "+property.getFloor() + " Unit: "+property.getUnit();
         floor.setText(floorString);
         String numRoom = "Number of Rooms:"+property.getNumRoom();
         numRooms.setText(numRoom);
@@ -73,8 +73,11 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         if (property.getWater()) {
             utilities1 += ("Water, ");
         }
-
-        utilities.setText(utilities1.substring(0, utilities1.length() - 2));
+        if (property.getHeating() || property.getHydro() || property.getWater()) {
+            utilities.setText(utilities1.substring(0, utilities1.length() - 2));
+        } else {
+            utilities.setText("No Utilities");
+        }
 
         if (property.getManager().isEmpty()){
             manager.setText("No Manager");

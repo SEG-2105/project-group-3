@@ -43,7 +43,7 @@ public class PropertyList  extends ArrayAdapter<Property> {
         Property property = properties.get(position);
         address.setText(property.getAddress());
         type.setText(property.getType());
-        String floorString = "Floor: "+property.getFloor();
+        String floorString = "Floor: "+property.getFloor() + " Unit: "+property.getUnit();
         floor.setText(floorString);
         String numRoom = "Number of Rooms:"+property.getNumRoom();
         numRooms.setText(numRoom);
@@ -70,8 +70,12 @@ public class PropertyList  extends ArrayAdapter<Property> {
         if (property.getWater()) {
             utilities1 += ("Water, ");
         }
+        if (property.getHeating() || property.getHydro() || property.getWater()) {
+            utilities.setText(utilities1.substring(0, utilities1.length() - 2));
+        } else {
+            utilities.setText("No Utilities");
+        }
 
-        utilities.setText(utilities1.substring(0, utilities1.length() - 2));
         return listViewItem;
     }
 

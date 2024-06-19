@@ -123,7 +123,7 @@ public class PropertiesActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
-                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
                                         (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));

@@ -88,7 +88,7 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         if (property.getClient().isEmpty()){
             client.setText("No Client");
         } else {
-            client.setText(property.getManager());
+            client.setText(property.getClient());
         }
         Toast.makeText(context, "Instantiated property list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;

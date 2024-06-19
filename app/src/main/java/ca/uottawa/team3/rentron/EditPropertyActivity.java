@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -159,35 +161,43 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         deleteProperty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Assuming 'properties' is the name of your collection
                 firestore.collection("properties")
                         .whereEqualTo("address", propertyAddressDB)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        firestore.collection("properties").document(document.getId()).delete()
+                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                    // Assuming there is only one document with the given address
+                                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                    String client = document.getString("client");
+                                    if (client != null && client.isEmpty()) {
+                                        // Delete the document if client is empty
+                                        document.getReference().delete()
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        // Document successfully deleted
-                                                        Log.d("Firestore", "DocumentSnapshot successfully deleted!");
+                                                        Toast.makeText(getApplicationContext(), "Property deleted successfully.", Toast.LENGTH_SHORT).show();
                                                         Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
                                                         startActivityForResult(intent, 0);
                                                         finish();
+
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
-                                                        // An error occurred
-                                                        Log.w("Firestore", "Error deleting document", e);
+                                                        Toast.makeText(getApplicationContext(), "Failed to delete the property.", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
+                                    } else {
+                                        // Show a toast if the property is occupied
+                                        Toast.makeText(getApplicationContext(), "The property is occupied.", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Log.d("Firestore", "Error getting documents: ", task.getException());
+                                    // Show a toast if no property is found with the given address
+                                    Toast.makeText(getApplicationContext(), "No property found with the given address.", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

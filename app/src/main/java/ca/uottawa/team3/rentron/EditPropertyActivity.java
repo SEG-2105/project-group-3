@@ -5,17 +5,20 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.StrikethroughSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -30,9 +33,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Users.PropertyMgr;
 
 public class EditPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText
@@ -57,6 +62,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
 
     FirebaseFirestore firestore;
     Property propertyToEdit;
+    PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,6 +191,13 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             }
         });
 
+        selectMgr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPropertyMgrDialog(firestore);
+            }
+        });
+
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
 
@@ -256,5 +269,47 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     }
 
     public void onClickDeleteProperty(View view) {
+    }
+
+    private void showPropertyMgrDialog(FirebaseFirestore db) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.register_property_selectmgr_dialog, null);
+        dialogBuilder.setView(dialogView);
+        final ListView propertyMgrListView = dialogView.findViewById(R.id.listViewPropertyMgrs);
+
+        ArrayList<PropertyMgr> propertyMgrList = new ArrayList<PropertyMgr>();
+
+        db.collection("users").whereEqualTo("role", "property-manager")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                PropertyMgr propertyMgr = new PropertyMgr((String) document.get("firstname"), (String) document.get("lastname"),
+                                        (String) document.get("email"));
+                                propertyMgrList.add(propertyMgr);
+                            }
+                            PropertyMgrListAdapter mgrsAdapter = new PropertyMgrListAdapter(EditPropertyActivity.this, propertyMgrList);
+
+                            propertyMgrListView.setAdapter(mgrsAdapter);
+                        } else {
+                            Log.d("showPropertyMgrDialog:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        dialogBuilder.setTitle("Property Managers:");
+        final AlertDialog b = dialogBuilder.create();
+        b.show();
+        propertyMgrListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                propertyMgrToAssign = propertyMgrList.get(i);
+                selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
+                b.dismiss();
+            }
+        });
     }
 }

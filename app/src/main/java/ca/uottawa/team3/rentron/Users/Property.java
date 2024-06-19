@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Property {
 
-    protected Map<String, Object> propertyData;
+    protected HashMap<String, Object> propertyData;
 
     public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, String utilities, String landlord) {
         propertyData = new HashMap<>();
@@ -73,7 +73,6 @@ public class Property {
         propertyData.put("client",client);
     }
 
-
     public String getAddress() {
         return this.propertyData.get("address").toString();
     }
@@ -114,6 +113,8 @@ public class Property {
     public String getClient() {
         return this.propertyData.get("client").toString();
     }
+
+    public HashMap<String, Object> getPropertyData() { return this.propertyData; }
 
     public boolean isValid() {
         return !(this.getAddress().equals("") || this.getType().equals("") ||( this.getType().equals("apartment") && this.getFloor().equals("") )|| this.getNumRoom().equals("") || this.getNumBathroom().equals("") ||  this.getNumFloor().equals("") ||  this.getArea().equals("") ||  this.getLaundry().equals("") ||  this.getNumParkingSpot().equals("") ||  this.getRent().equals("") ||  this.getUtilities().equals(""));

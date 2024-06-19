@@ -88,7 +88,8 @@ public class EditPropertyActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
+                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
+                                        (boolean)document.get("heating"), (boolean)document.get("water"), (boolean)document.get("hydro"),
                                         (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
 
 

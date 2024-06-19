@@ -1,13 +1,10 @@
 package ca.uottawa.team3.rentron.Users;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 import javax.crypto.SecretKey;
-
-import ca.uottawa.team3.rentron.Property;
 
 public class PropertyMgr extends User {
     // WILL BE EXPANDED ON / USED IN LATER DELIVERABLES

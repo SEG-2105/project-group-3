@@ -6,9 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
+
+import ca.uottawa.team3.rentron.Users.Property;
 
 public class PropertyList  extends ArrayAdapter<Property> {
 
@@ -47,7 +48,7 @@ public class PropertyList  extends ArrayAdapter<Property> {
         numBathrooms.setText(property.getNumBathroom());
         numFloors.setText(property.getNumFloor());
         area.setText(property.getArea());
-        laundry.setText((property.getLaundry()) ? "Laundry: Yes":"Laundry: No");
+        laundry.setText((property.getLaundry()));
         parking.setText(property.getNumParkingSpot());
         rent.setText(property.getRent());
         utilities.setText(property.getUtilities());

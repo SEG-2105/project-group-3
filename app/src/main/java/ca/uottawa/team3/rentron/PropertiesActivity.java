@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -26,9 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -36,6 +32,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import ca.uottawa.team3.rentron.Users.Property;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
@@ -127,7 +125,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                 Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
                                 Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                        (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
+                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
                                         (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
                                 if (role.equals("landlord")) {
                                     if (db_property.getLandlord().equals(email)){

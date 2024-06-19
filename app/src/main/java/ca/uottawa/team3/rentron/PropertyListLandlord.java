@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import ca.uottawa.team3.rentron.Users.Property;
+
 public class PropertyListLandlord extends ArrayAdapter<Property> {
 
     private Activity context;
@@ -49,7 +51,7 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         numBathrooms.setText(property.getNumBathroom());
         numFloors.setText(property.getNumFloor());
         area.setText(property.getArea());
-        laundry.setText((property.getLaundry()) ? "Laundry: Yes":"Laundry: No");
+        laundry.setText((property.getLaundry()));
         parking.setText(property.getNumParkingSpot());
         rent.setText(property.getRent());
         utilities.setText(property.getUtilities());

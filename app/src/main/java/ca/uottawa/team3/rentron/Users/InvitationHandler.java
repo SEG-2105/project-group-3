@@ -4,8 +4,6 @@ import android.util.Log;
 
 import java.util.Objects;
 
-import ca.uottawa.team3.rentron.Property;
-
 // TO BE EXPANDED UPON IN THE UPCOMING DELIVERABLES
 public class InvitationHandler {
     private PropertyMgr manager;

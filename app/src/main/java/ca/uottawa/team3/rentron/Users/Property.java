@@ -1,17 +1,13 @@
-package ca.uottawa.team3.rentron;
+package ca.uottawa.team3.rentron.Users;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import ca.uottawa.team3.rentron.Users.Client;
-import ca.uottawa.team3.rentron.Users.Landlord;
-import ca.uottawa.team3.rentron.Users.PropertyMgr;
 
 public class Property {
 
     protected Map<String, Object> propertyData;
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord) {
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, String utilities, String landlord) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -33,7 +29,7 @@ public class Property {
         propertyData.put("client","");
     }
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager) {
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -55,7 +51,7 @@ public class Property {
         propertyData.put("client","");
     }
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, Boolean laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager, String client) {
+    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, String utilities, String landlord, String manager, String client) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -99,9 +95,7 @@ public class Property {
     public String getArea() {
         return this.propertyData.get("area").toString();
     }
-    public Boolean getLaundry() {
-        return Boolean.valueOf(this.propertyData.get("laundry").toString());
-    }
+    public String getLaundry() { return this.propertyData.get("laundry").toString(); }
     public String getNumParkingSpot() {
         return this.propertyData.get("numParkingSpot").toString();
     }

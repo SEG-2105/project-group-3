@@ -16,6 +16,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import ca.uottawa.team3.rentron.Users.Property;
+
 public class EditPropertyActivity extends AppCompatActivity {
     FirebaseFirestore firestore;
     Property propertyToEdit;
@@ -38,7 +40,7 @@ public class EditPropertyActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("floor"),
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                        (Boolean)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
+                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (String)document.get("utilities"),
                                         (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
                             }
                         } else {

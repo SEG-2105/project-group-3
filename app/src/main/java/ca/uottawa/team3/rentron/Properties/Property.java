@@ -50,7 +50,7 @@ public class Property {
         propertyData.put("client","");
     }
 
-    public Property(String address, String type, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, boolean heating, boolean hydro, boolean water, String landlord, String manager, String client) {
+    public Property(String address, String type, String unit, String floor, String numRoom, String numBathroom, String numFloor, String area, String laundry, String numParkingSpot, String rent, boolean heating, boolean hydro, boolean water, String landlord, String manager, String client) {
         propertyData = new HashMap<>();
         propertyData.put("address", address);
         propertyData.put("type", type);
@@ -62,6 +62,7 @@ public class Property {
         propertyData.put("numRoom", numRoom);
         propertyData.put("numBathroom", numBathroom);
         propertyData.put("numFloor", numFloor);
+        propertyData.put("unit", unit);
         propertyData.put("area", area);
         propertyData.put("laundry", laundry);
         propertyData.put("numParkingSpot", numParkingSpot);
@@ -93,6 +94,9 @@ public class Property {
     }
     public String getNumFloor() {
         return this.propertyData.get("numFloor").toString();
+    }
+    public String getUnit() {
+        return this.propertyData.get("unit").toString();
     }
     public String getArea() {
         return this.propertyData.get("area").toString();

@@ -39,11 +39,13 @@ public class PropertyMgr extends User {
 
     public void addInvitation(Invitation invite) {
         this.invitations.add(invite);
+        this.userData.put("invitations", invitations);
     }
 
     public boolean removeInvitation(Invitation invite) {
         try {
             this.invitations.remove(invite);
+            this.userData.put("invitations", invitations);
             return true;
         } catch (Exception e) {
             return false;
@@ -53,6 +55,7 @@ public class PropertyMgr extends User {
     public boolean clearInvitations() {
         try {
             this.invitations.clear();
+            this.userData.put("invitations", "");
             return true;
         } catch (Exception e) {
             return false;

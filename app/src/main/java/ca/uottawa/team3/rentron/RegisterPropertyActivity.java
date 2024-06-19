@@ -3,6 +3,7 @@ package ca.uottawa.team3.rentron;
 import ca.uottawa.team3.rentron.Properties.Property;
 import ca.uottawa.team3.rentron.Properties.PropertyCreator;
 import ca.uottawa.team3.rentron.Users.*;
+import ca.uottawa.team3.rentron.Users.Invitations.InvitationHandler;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -184,6 +185,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
                 String landlord = activeEmail;  // Replace with actual landlord value
                 String manager = selectMgr.getText().toString();
+                double commission = 0; // 0 as default value (this only matters if an invite is sent upon registration)
                 String client = ""; // blank for now, since client booking comes later
 
 
@@ -192,9 +194,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                         numFloor, area, laundry, numParkingSpot,
                         rent, landlord, manager, client)
                 ) {
-//                    Property property; // = new Property(...args...);
-//                    PropertyMgr manager; // = new PropertyMgr(...args...);
-//                    Landlord landlord; // = new Landlord(...args...);
 
                     Property property = new Property(
                             address,
@@ -220,15 +219,9 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     PropertyCreator creator = new PropertyCreator(getApplicationContext(), firestore);
                     if (creator.add(property)) { // if addition successful
                         // invitation logic
-                        //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
-                        //inviteHandler.sendInviteToManager();
-
-                        // append to invitation logic something like:
-                    /*
-                        if(!Objects.isNull(manager)) {
-                            ...manually add manager to property's Firebase document... (since we are assuming invites are automatically accepted)
-                        }
-                     */
+                        PropertyMgr mgr = new PropertyMgr("","",manager); // create blank mgr to simulate invitation system... will be expanded upon
+                        InvitationHandler inviteHandler = new InvitationHandler(property, mgr, landlord, commission);
+                        inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
 
                         // ending logic (subject to change)
                         Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);

@@ -1,31 +1,39 @@
 package ca.uottawa.team3.rentron.Users.Invitations;
 
+import android.app.Application;
+import android.content.Context;
 import android.util.Log;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Users.Landlord;
+
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
 
 // TO BE EXPANDED UPON IN THE UPCOMING DELIVERABLES
-public class InvitationHandler {
+public class InvitationHandler extends Application {
     private PropertyMgr manager;
     private Property property;
-    private Landlord landlord;
+    private String landlord;
     private double commission;
     private Invitation invite;
 
-    public InvitationHandler(Property property, PropertyMgr manager, Landlord landlord, double commission) {
+    Context context;
+    FirebaseFirestore firestore;
+
+    public InvitationHandler(Property property, PropertyMgr manager, String landlordEmail, double commission) {
         this.manager = manager;
         this.property = property;
         this.landlord = landlord;
         this.commission = commission;
-        this.invite = new Invitation(property, manager, landlord, commission);
+        this.invite = new Invitation(property, (String)manager.getEmail(), landlord, commission);
     }
 
     public void sendInviteToManager() {
         if (!Objects.isNull(manager)) {
+
             manager.addInvitation(invite);
         } else {
             Log.d("InvitationHandler:", "Could not send invite to manager!");

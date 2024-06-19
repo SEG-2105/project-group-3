@@ -56,13 +56,14 @@ public class Property {
         propertyData.put("type", type);
         if ("Apartment".equals(propertyData.get("type"))) {
             propertyData.put("floor", floor);
+            propertyData.put("unit", unit);
         } else {
             propertyData.put("floor", "N/A");
+            propertyData.put("unit", "N/A");
         }
         propertyData.put("numRoom", numRoom);
         propertyData.put("numBathroom", numBathroom);
         propertyData.put("numFloor", numFloor);
-        propertyData.put("unit", unit);
         propertyData.put("area", area);
         propertyData.put("laundry", laundry);
         propertyData.put("numParkingSpot", numParkingSpot);

@@ -31,7 +31,7 @@ public class PropertyMgrListAdapter extends ArrayAdapter<PropertyMgr>  {
 
         PropertyMgr propertyMgr = propertyMgrs.get(position);
         name.setText(propertyMgr.getFirstName() + " " + propertyMgr.getLastName());
-        Toast.makeText(context, "Instantiated mgr list!!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "Instantiated mgr list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;
     }
 }

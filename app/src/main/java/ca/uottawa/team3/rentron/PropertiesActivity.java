@@ -138,7 +138,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
                             }
 
                             if (role.equals("landlord")) {
@@ -161,7 +161,7 @@ public class PropertiesActivity extends AppCompatActivity {
                     }
                 });
 
-        // ONLY LANDLORDS CAN HAVE ACCESS TO THIS BUTTON
+        // ONLY LANDLORDS SHOULD HAVE ACCESS TO THIS BUTTON
         btnProperty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

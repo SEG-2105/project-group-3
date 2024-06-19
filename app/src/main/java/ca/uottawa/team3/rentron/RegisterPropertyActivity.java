@@ -33,7 +33,7 @@ import java.util.List;
 
 public class RegisterPropertyActivity extends AppCompatActivity {
 
-    Button selectMgr;
+    Button selectMgr, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
 
@@ -47,6 +47,7 @@ public class RegisterPropertyActivity extends AppCompatActivity {
         setSupportActionBar(topBar);
 
         selectMgr = (Button)findViewById(R.id.propertyManager);
+        register = (Button)findViewById(R.id.btnRegisterProperty);
 
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +78,17 @@ public class RegisterPropertyActivity extends AppCompatActivity {
                 showPropertyMgrDialog(firestore);
             }
         });
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fieldCheck();
+                // add property registration logic here...
+            }
+        });
+    }
+
+    private void fieldCheck() {
+        // field checking logic goes here...
     }
 
     private void showPropertyMgrDialog(FirebaseFirestore db) {

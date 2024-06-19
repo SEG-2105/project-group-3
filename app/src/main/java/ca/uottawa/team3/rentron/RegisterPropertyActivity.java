@@ -125,17 +125,21 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
             public void onClick(View v) {
                 if (fieldCheck()) {
                     Property property; // = new Property(...args...);
-                    // add property registration logic here...
+                    PropertyMgr manager; // = new PropertyMgr(...args...);
+                    Landlord landlord; // = new Landlord(...args...);
 
-                    // basic invitation logic
-                    String propertyId = ""; // this would be the unique Firebase document ID of the property
-                    if (!Objects.isNull(propertyMgr)) {
-                        propertyMgr.addInvitation(propertyId);
-                    } else {
-                        // do nothing...?
-                    }
-                    // clear selected PropertyMgr's invitation list since, for now, all invitations are automatically accepted
-                    propertyMgr.clearInvitations();
+                    // add property registration logic here...
+                    // along with something like:
+                    /*
+                        if(!Objects.isNull(manager)) {
+                            ...manually add manager to property's Firebase document...
+                        }
+                     */
+
+                    // invitation logic
+                    //InvitationHandler inviteHandler = new InvitationHandler(property, manager);
+                    //inviteHandler.sendInviteToManager();
+
 
                     // ending logic (subject to change)
                     Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);

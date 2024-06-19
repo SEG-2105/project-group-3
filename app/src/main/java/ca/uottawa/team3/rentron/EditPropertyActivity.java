@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.FieldPath;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -65,6 +66,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     FirebaseFirestore firestore;
     Property propertyToEdit;
     PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
+    String propertyDocId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +153,8 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                 // Set Buttons
                                 selectMgr.setText(db_property.getManager());
                                 selectClient.setText(db_property.getClient());
+
+                                propertyDocId = document.getId(); // get UUID of property to prevent any conflicts when editing/removing
                             }
                         } else {
                             Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());
@@ -163,7 +167,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             public void onClick(View v) {
                 // Assuming 'properties' is the name of your collection
                 firestore.collection("properties")
-                        .whereEqualTo("address", propertyAddressDB)
+                        .whereEqualTo(FieldPath.documentId(), propertyDocId)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override

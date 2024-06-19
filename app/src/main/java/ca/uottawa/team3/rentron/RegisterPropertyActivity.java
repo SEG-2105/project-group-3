@@ -123,25 +123,25 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fieldCheck();
-                Property property; // = new Property(...args...);
-                // add property registration logic here...
+                if (fieldCheck()) {
+                    Property property; // = new Property(...args...);
+                    // add property registration logic here...
 
-                // basic invitation logic
-                String propertyId = ""; // this would be the unique Firebase document ID of the property
-                if (!Objects.isNull(propertyMgr)) {
-                    propertyMgr.addInvitation(propertyId);
-                }
-                else {
-                    // do nothing...?
-                }
-                // clear selected PropertyMgr's invitation list since, for now, all invitations are automatically accepted
-                propertyMgr.clearInvitations();
+                    // basic invitation logic
+                    String propertyId = ""; // this would be the unique Firebase document ID of the property
+                    if (!Objects.isNull(propertyMgr)) {
+                        propertyMgr.addInvitation(propertyId);
+                    } else {
+                        // do nothing...?
+                    }
+                    // clear selected PropertyMgr's invitation list since, for now, all invitations are automatically accepted
+                    propertyMgr.clearInvitations();
 
-                // ending logic (subject to change)
-                Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
-                startActivityForResult(intent, 0);
-                finish();
+                    // ending logic (subject to change)
+                    Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                    startActivityForResult(intent, 0);
+                    finish();
+                }
             }
         });
     }
@@ -185,8 +185,9 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         // Required by the abstract class
     }
 
-    private void fieldCheck() {
+    private boolean fieldCheck() {
         // field checking logic goes here...
+        return true;
     }
 
     private void showPropertyMgrDialog(FirebaseFirestore db) {

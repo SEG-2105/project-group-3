@@ -184,8 +184,8 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                                     // Assuming there is only one document with the given ID
                                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                                    String client = document.getString("client");
-                                    if (client != null && client.isEmpty()) {
+                                    String client = selectClient.getText().toString();
+                                    if (client.equals("")) {
                                         // Delete the document if client is empty
                                         document.getReference().delete()
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

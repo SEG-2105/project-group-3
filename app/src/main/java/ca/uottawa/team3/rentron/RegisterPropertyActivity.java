@@ -68,8 +68,9 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     Button selectMgr, register;
     FirebaseFirestore firestore;
     List<PropertyMgr> propertyMgrList;
-    PropertyMgr propertyMgr; // the property manager that will be assigned to this property (if applicable.)
+    PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
     ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
+    double commission;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -237,16 +238,16 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                                     }
                                 });
                         // trying to get doc ID for invitation, not working right now
-                        while(!query.isComplete()); // hacky...
-                        if (query.isSuccessful()) {
-                            if (!query.getResult().isEmpty()) {
-                                propertyId = query.getResult().getDocuments().get(0).getId();
-                            }
-                        }
+                        //while(!query.isComplete()); // hacky...
+                        //if (query.isSuccessful()) {
+                        //    if (!query.getResult().isEmpty()) {
+                        //        propertyId = query.getResult().getDocuments().get(0).getId();
+                        //    }
+                        //}
 
                         PropertyMgr mgr = new PropertyMgr("", "", manager); // create blank mgr to simulate invitation system... will be expanded upon
-                        InvitationHandler inviteHandler = new InvitationHandler(propertyId, mgr, landlord, commission);
-                        inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
+                        //InvitationHandler inviteHandler = new InvitationHandler(propertyId, mgr, landlord, commission);
+                        //inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
 
                         // ending logic (subject to change)
                         Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
@@ -320,6 +321,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         final View dialogView = inflater.inflate(R.layout.register_property_selectmgr_dialog, null);
         dialogBuilder.setView(dialogView);
         final ListView propertyMgrListView = dialogView.findViewById(R.id.listViewPropertyMgrs);
+        EditText commissionEditText = dialogView.findViewById(R.id.editTextCommissionNumber);
+        commissionEditText.setText(Double.toString(commission));
 
         ArrayList<PropertyMgr> propertyMgrList = new ArrayList<PropertyMgr>();
 
@@ -349,10 +352,26 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         propertyMgrListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                propertyMgr = propertyMgrList.get(i);
-                selectMgr.setText(propertyMgr.getFirstName() + " " + propertyMgr.getLastName());
-                b.dismiss();
+                try {
+                    commission = Double.parseDouble(commissionEditText.getText().toString());
+                    Log.d("Commission:", Double.toString(commission));
+                    if ((commission < 0) || (commission >= 100)) {
+                        showDialogFailureToast();
+                    }
+                    else {
+                        propertyMgrToAssign = propertyMgrList.get(i);
+                        selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
+                        b.dismiss();
+                    }
+                }
+                catch (Exception e) {
+                    Toast.makeText(b.getContext(), "Invalid commission inputted.", Toast.LENGTH_SHORT);
+                }
             }
         });
+    }
+
+    public void showDialogFailureToast() {
+        Toast.makeText(this, "Invalid commission inputted, needs to be between 0 and 99.", Toast.LENGTH_SHORT).show();
     }
 }

@@ -218,88 +218,6 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                 showPropertyMgrDialog(firestore);
             }
         });
-        edit.setOnClickListener(new View.OnClickListener() {
-            final String address = String.valueOf(propertyAddress.getText());
-            final String type = String.valueOf(propertyType.getSelectedItem());
-            final String unit = String.valueOf(propertyUnit.getText());
-            final String floor = String.valueOf(propertyFloor.getText());
-            final String numRoom = String.valueOf(propertyBedrooms.getText());
-            final String numBathroom = String.valueOf(propertyBathrooms.getText());
-            final String numFloor = String.valueOf(propertyNumFloors.getText());
-            final String area = String.valueOf(propertyArea.getText());
-            final String laundry = String.valueOf(propertyLaundry.getSelectedItem());
-            final String numParkingSpot = String.valueOf(propertyParking.getText());
-            final String rent = String.valueOf(propertyRent.getText());
-            final String mgr = String.valueOf(selectMgr.getText());
-            final String client = String.valueOf(selectClient.getText());
-
-            @Override
-            public void onClick(View v) {
-                if (fieldCheck(address, type, unit, floor, numRoom, numBathroom,
-                        numFloor, area, laundry, numParkingSpot, rent)) {
-                    if (!originalRent.equals(rent)) {
-                        if ((client.equals("")) || (Objects.isNull(client))) {
-                            Toast.makeText(getApplicationContext(), "Cannot update rent if client assigned.", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            updateDoc();
-                        }
-                    }
-                    else {
-                        if ((client.equals("")) || (Objects.isNull(client)) && (!mgr.equals("")) || (Objects.isNull(mgr))) {
-                            Toast.makeText(getApplicationContext(), "Cannot invite manager if no clients assigned.", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            updateDoc();
-                        }
-                    }
-
-                }
-            }
-            public void updateDoc() {
-                firestore.collection("properties")
-                        .whereEqualTo(FieldPath.documentId(), propertyDocId)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                    // Assuming there is only one document with the given ID
-                                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                                    DocumentReference reference = document.getReference();
-                                    reference.update("address", address,
-                                            "type", type,
-                                            "unit", unit,
-                                            "floor", floor,
-                                            "numRoom", numRoom,
-                                            "numBathroom", numBathroom,
-                                            "numFloor", numFloor,
-                                            "area", area,
-                                            "laundry", laundry,
-                                            "numParkingSpot", numParkingSpot,
-                                            "rent", rent,
-                                            "manager", mgr,
-                                            "client", client).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d("EditPropertyActivity:", "Property successfully updated!");
-                                                    }
-                                                })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w("EditPropertyActivity:", "Error updating property", e);
-                                                }
-                                            });
-
-                                } else {
-                                    // Show a toast if no property is found with the given address
-                                    Toast.makeText(getApplicationContext(), "No property found with the given address.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-            }
-        });
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -369,6 +287,97 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     }
 
     public void onClickEditProperty(View view) {
+        final String address = String.valueOf(propertyAddress.getText());
+        final String type = String.valueOf(propertyType.getSelectedItem());
+        final String unit = String.valueOf(propertyUnit.getText());
+        final String floor = String.valueOf(propertyFloor.getText());
+        final String numRoom = String.valueOf(propertyBedrooms.getText());
+        final String numBathroom = String.valueOf(propertyBathrooms.getText());
+        final String numFloor = String.valueOf(propertyNumFloors.getText());
+        final String area = String.valueOf(propertyArea.getText());
+        final String laundry = String.valueOf(propertyLaundry.getSelectedItem());
+        final String numParkingSpot = String.valueOf(propertyParking.getText());
+        final String rent = String.valueOf(propertyRent.getText());
+        final String mgr = String.valueOf(selectMgr.getText());
+        final String client = String.valueOf(selectClient.getText());
+        final boolean heating = propertyHeating.isChecked();
+        final boolean hydro = propertyHydro.isChecked();
+        final boolean water = propertyWater.isChecked();
+
+        if (fieldCheck(address, type, unit, floor, numRoom, numBathroom,
+                numFloor, area, laundry, numParkingSpot, rent)) {
+            if (!originalRent.equals(rent)) {
+                if ((client.equals("")) || (Objects.isNull(client))) {
+                    Toast.makeText(getApplicationContext(), "Cannot update rent if client assigned.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    updateDoc(address, type, unit, floor, numRoom, numBathroom, numFloor, area, laundry, numParkingSpot, rent,
+                            mgr, client, heating, hydro, water);
+                }
+            }
+            else {
+                if ((client.equals("")) || (Objects.isNull(client)) && (!mgr.equals("")) || (Objects.isNull(mgr))) {
+                    Toast.makeText(getApplicationContext(), "Cannot invite manager if no clients assigned.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    updateDoc(address, type, unit, floor, numRoom, numBathroom, numFloor, area, laundry, numParkingSpot, rent,
+                            mgr, client, heating, hydro, water);
+                }
+            }
+
+        }
+    }
+
+    public void updateDoc(String address, String type, String unit, String floor, String numRoom, String numBathroom,
+                          String numFloor, String area, String laundry, String numParkingSpot, String rent, String mgr,
+                          String client, boolean heating, boolean hydro, boolean water) {
+        firestore.collection("properties")
+                .whereEqualTo(FieldPath.documentId(), propertyDocId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            // Assuming there is only one document with the given ID
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            DocumentReference reference = document.getReference();
+                            reference.update("address", address,
+                                            "type", type,
+                                            "unit", unit,
+                                            "floor", floor,
+                                            "numRoom", numRoom,
+                                            "numBathroom", numBathroom,
+                                            "numFloor", numFloor,
+                                            "area", area,
+                                            "laundry", laundry,
+                                            "numParkingSpot", numParkingSpot,
+                                            "rent", rent,
+                                            "manager", mgr,
+                                            "client", client,
+                                            "heating", heating,
+                                            "hydro", hydro,
+                                            "water", water).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("EditPropertyActivity:", "Property successfully updated!");
+                                            Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                                            startActivityForResult (intent,0);
+                                            finish();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("EditPropertyActivity:", "Error updating property", e);
+                                        }
+                                    });
+
+                        } else {
+                            // Show a toast if no property is found with the given address
+                            Toast.makeText(getApplicationContext(), "No property found with the given address.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     public void onClickDeleteProperty(View view) {

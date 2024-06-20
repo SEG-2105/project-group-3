@@ -212,6 +212,17 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             }
         });
 
+        selectClient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectClient.getText().toString().isEmpty()) {
+                    selectClient.setText("Example Client");
+                } else {
+                    selectClient.setText("");
+                }
+            }
+        });
+
         selectMgr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -306,7 +317,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         if (fieldCheck(address, type, unit, floor, numRoom, numBathroom,
                 numFloor, area, laundry, numParkingSpot, rent)) {
             if (!originalRent.equals(rent)) {
-                if ((client.equals("")) || (Objects.isNull(client))) {
+                if (!((client.isEmpty()) || (Objects.isNull(client)))) {
                     Toast.makeText(getApplicationContext(), "Cannot update rent if client assigned.", Toast.LENGTH_SHORT).show();
                 }
                 else {

@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Properties.PropertyCreator;
+import ca.uottawa.team3.rentron.Users.Invitations.InvitationHandler;
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
 
 public class EditPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -67,8 +69,10 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     FirebaseFirestore firestore;
     Property propertyToEdit;
     PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
+    double commission; // commission of manager invite (if applicable.)
     String propertyDocId;
     String originalRent; // used for verifying if rent was changed
+    String landlordEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         propertyUnit = findViewById(R.id.propertyUnit);
         propertyType = findViewById(R.id.propertyType);
         propertyLaundry = findViewById(R.id.propertyLaundry);
+        landlordEmail = "";
 
         propertyType.setOnItemSelectedListener(this);
         propertyLaundry.setOnItemSelectedListener(this);
@@ -120,7 +125,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
                                         (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
                                         (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
-
+                                landlordEmail = db_property.getLandlord();
 
                                 // Populate the views with db_property data
                                 propertyAddress.setText(db_property.getAddress());
@@ -323,6 +328,12 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                 else {
                     updateDoc(address, type, unit, floor, numRoom, numBathroom, numFloor, area, laundry, numParkingSpot, rent,
                             mgr, client, heating, hydro, water);
+
+                    // invitation logic for now
+                    PropertyMgr manager = new PropertyMgr("", "", mgr); // create blank mgr to simulate invitation system... will be expanded upon
+                    InvitationHandler inviteHandler = new InvitationHandler(propertyDocId, manager, landlordEmail, commission);
+                    inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
+
                 }
             }
             else {
@@ -402,6 +413,8 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         final View dialogView = inflater.inflate(R.layout.register_property_selectmgr_dialog, null);
         dialogBuilder.setView(dialogView);
         final ListView propertyMgrListView = dialogView.findViewById(R.id.listViewPropertyMgrs);
+        EditText commissionEditText = dialogView.findViewById(R.id.editTextCommissionNumber);
+        commissionEditText.setText(Double.toString(commission));
 
         ArrayList<PropertyMgr> propertyMgrList = new ArrayList<PropertyMgr>();
 
@@ -431,11 +444,27 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         propertyMgrListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                propertyMgrToAssign = propertyMgrList.get(i);
-                selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
-                b.dismiss();
+                try {
+                    commission = Double.parseDouble(commissionEditText.getText().toString());
+                    Log.d("Commission:", Double.toString(commission));
+                    if ((commission < 0) || (commission >= 100)) {
+                        showDialogFailureToast();
+                    }
+                    else {
+                        propertyMgrToAssign = propertyMgrList.get(i);
+                        selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
+                        b.dismiss();
+                    }
+                }
+                catch (Exception e) {
+                    Toast.makeText(b.getContext(), "Invalid commission inputted.", Toast.LENGTH_SHORT);
+                }
             }
         });
+    }
+
+    public void showDialogFailureToast() {
+        Toast.makeText(this, "Invalid commission inputted, needs to be between 0 and 99.", Toast.LENGTH_SHORT).show();
     }
 
     private boolean fieldCheck(

@@ -244,7 +244,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                             }
                         }
 
-
                         PropertyMgr mgr = new PropertyMgr("", "", manager); // create blank mgr to simulate invitation system... will be expanded upon
                         InvitationHandler inviteHandler = new InvitationHandler(propertyId, mgr, landlord, commission);
                         inviteHandler.sendInviteToManager(); // dummy code, will be expanded on

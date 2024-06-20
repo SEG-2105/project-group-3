@@ -90,7 +90,7 @@ public class PropertyListLandlord extends ArrayAdapter<Property> {
         } else {
             client.setText(property.getClient());
         }
-        Toast.makeText(context, "Instantiated property list!!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "Instantiated property list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;
     }
 

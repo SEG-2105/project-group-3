@@ -218,7 +218,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     // add property registration logic here...
                     PropertyCreator creator = new PropertyCreator(getApplicationContext(), firestore);
                     // invitation logic
-                    String propertyId = "";
+                    String propertyId = "12345"; // dummy id
                     if(creator.add(property)) {
                         // search firebase for newly generated property UUID
                         Task<QuerySnapshot> query = firestore.collection("properties")
@@ -229,11 +229,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {
                                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
-                                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
-                                                        (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
-                                                        (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
 
                                             }
                                         } else {
@@ -241,9 +236,12 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                                         }
                                     }
                                 });
+                        // trying to get doc ID for invitation, not working right now
                         while(!query.isComplete()); // hacky...
                         if (query.isSuccessful()) {
-                            propertyId = query.getResult().getDocuments().get(0).getId();
+                            if (!query.getResult().isEmpty()) {
+                                propertyId = query.getResult().getDocuments().get(0).getId();
+                            }
                         }
 
 

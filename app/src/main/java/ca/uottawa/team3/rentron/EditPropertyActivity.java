@@ -264,7 +264,6 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             applyStrikethrough(propertyFloorLabel);
             applyStrikethrough(propertyUnitLabel);
             removeStrikethrough(propertyNumFloorsLabel);
-            propertyNumFloors.setText("");
             propertyFloor.setText("");
             propertyUnit.setText("");
         }
@@ -316,8 +315,8 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                 }
             }
             else {
-                if ((client.equals("")) || (Objects.isNull(client)) && (!mgr.equals("")) || (Objects.isNull(mgr))) {
-                    Toast.makeText(getApplicationContext(), "Cannot invite manager if no clients assigned.", Toast.LENGTH_SHORT).show();
+                if ((!client.equals("")) && (mgr.equals(""))) {
+                    Toast.makeText(getApplicationContext(), "Cannot invite client if no manager assigned.", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     updateDoc(address, type, unit, floor, numRoom, numBathroom, numFloor, area, laundry, numParkingSpot, rent,
@@ -325,6 +324,9 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                 }
             }
 
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Fields invalid.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -431,7 +433,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             String rent) {
 
         // field checking logic goes here...
-        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty());
+        return !(address.isEmpty() || type.isEmpty() || ( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty());
     }
 
 }

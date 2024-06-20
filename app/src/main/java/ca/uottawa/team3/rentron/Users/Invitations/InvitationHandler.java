@@ -15,20 +15,20 @@ import ca.uottawa.team3.rentron.Users.PropertyMgr;
 // TO BE EXPANDED UPON IN THE UPCOMING DELIVERABLES
 public class InvitationHandler extends Application {
     private PropertyMgr manager;
-    private Property property;
-    private String landlord;
+    private String propertyId;
+    private String landlordEmail;
     private double commission;
     private Invitation invite;
 
     Context context;
     FirebaseFirestore firestore;
 
-    public InvitationHandler(Property property, PropertyMgr manager, String landlordEmail, double commission) {
+    public InvitationHandler(String propertyId, PropertyMgr manager, String landlordEmail, double commission) {
         this.manager = manager;
-        this.property = property;
-        this.landlord = landlord;
+        this.propertyId = propertyId;
+        this.landlordEmail = landlordEmail;
         this.commission = commission;
-        this.invite = new Invitation(property, (String)manager.getEmail(), landlord, commission);
+        this.invite = new Invitation(propertyId, (String)manager.getEmail(), landlordEmail, commission);
     }
 
     public void sendInviteToManager() {

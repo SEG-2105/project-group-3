@@ -8,8 +8,8 @@ import ca.uottawa.team3.rentron.Users.*;
 public class Invitation {
     private HashMap<String, Object> invitationData;
 
-    public Invitation(Property property, String manager, String landlord, double commission) {
-        this.invitationData.put("property", property.getAddress());
+    public Invitation(String propertyId, String manager, String landlord, double commission) {
+        this.invitationData.put("property", propertyId);
         this.invitationData.put("manager", manager);
         this.invitationData.put("landlord", landlord);
         if ((commission >= 0) && (commission < 100)) { // commission percent has to be above (or eq. to) 0, or below 100

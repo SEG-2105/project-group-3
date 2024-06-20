@@ -192,7 +192,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 if (fieldCheck(
                         address, type, unit, floor, numRoom, numBathroom,
                         numFloor, area, laundry, numParkingSpot,
-                        rent, landlord, manager, client)
+                        rent)
                 ) {
 
                     Property property = new Property(
@@ -217,10 +217,38 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
                     // add property registration logic here...
                     PropertyCreator creator = new PropertyCreator(getApplicationContext(), firestore);
-                    if (creator.add(property)) { // if addition successful
-                        // invitation logic
-                        PropertyMgr mgr = new PropertyMgr("","",manager); // create blank mgr to simulate invitation system... will be expanded upon
-                        InvitationHandler inviteHandler = new InvitationHandler(property, mgr, landlord, commission);
+                    // invitation logic
+                    String propertyId = "";
+                    if(creator.add(property)) {
+                        // search firebase for newly generated property UUID
+                        Task<QuerySnapshot> query = firestore.collection("properties")
+                                .whereEqualTo("address", address)
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
+                                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
+                                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"),
+                                                        (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
+                                                        (String)document.get("landlord"), (String)document.get("manager"), (String)document.get("client"));
+
+                                            }
+                                        } else {
+                                            Log.d("EditPropertyActivity:", "Error getting documents: ", task.getException());
+                                        }
+                                    }
+                                });
+                        while(!query.isComplete()); // hacky...
+                        if (query.isSuccessful()) {
+                            propertyId = query.getResult().getDocuments().get(0).getId();
+                        }
+
+
+                        PropertyMgr mgr = new PropertyMgr("", "", manager); // create blank mgr to simulate invitation system... will be expanded upon
+                        InvitationHandler inviteHandler = new InvitationHandler(propertyId, mgr, landlord, commission);
                         inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
 
                         // ending logic (subject to change)
@@ -229,9 +257,11 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                         finish();
                     }
                     else {
-                        Toast.makeText(getApplicationContext(), "Could not register property.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Could not add property to database.", Toast.LENGTH_LONG).show();
                     }
-
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Fields invalid.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -281,10 +311,10 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private boolean fieldCheck(
             String address, String type, String unit, String floor, String numRoom, String numBathroom,
             String numFloor, String area, String laundry, String numParkingSpot,
-            String rent, String landlord, String manager, String client) {
+            String rent) {
 
         // field checking logic goes here...
-        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty() || landlord.isEmpty() || manager.isEmpty() || client.isEmpty());
+        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty());
     }
 
     private void showPropertyMgrDialog(FirebaseFirestore db) {

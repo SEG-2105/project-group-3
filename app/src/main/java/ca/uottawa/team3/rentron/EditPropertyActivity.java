@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -67,6 +68,8 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     Property propertyToEdit;
     PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
     String propertyDocId;
+    String originalRent; // used for verifying if rent was changed
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +132,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                                 propertyFloor.setText(db_property.getFloor());
                                 propertyUnit.setText(db_property.getUnit());
                                 propertyRent.setText(db_property.getRent());
+                                originalRent = db_property.getRent();
 
                                 // Populate Spinners with values
                                 ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(EditPropertyActivity.this, R.array.propertyTypeArray, android.R.layout.simple_spinner_item);
@@ -173,7 +177,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                    // Assuming there is only one document with the given address
+                                    // Assuming there is only one document with the given ID
                                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
                                     String client = document.getString("client");
                                     if (client != null && client.isEmpty()) {
@@ -212,6 +216,88 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             @Override
             public void onClick(View v) {
                 showPropertyMgrDialog(firestore);
+            }
+        });
+        edit.setOnClickListener(new View.OnClickListener() {
+            final String address = String.valueOf(propertyAddress.getText());
+            final String type = String.valueOf(propertyType.getSelectedItem());
+            final String unit = String.valueOf(propertyUnit.getText());
+            final String floor = String.valueOf(propertyFloor.getText());
+            final String numRoom = String.valueOf(propertyBedrooms.getText());
+            final String numBathroom = String.valueOf(propertyBathrooms.getText());
+            final String numFloor = String.valueOf(propertyNumFloors.getText());
+            final String area = String.valueOf(propertyArea.getText());
+            final String laundry = String.valueOf(propertyLaundry.getSelectedItem());
+            final String numParkingSpot = String.valueOf(propertyParking.getText());
+            final String rent = String.valueOf(propertyRent.getText());
+            final String mgr = String.valueOf(selectMgr.getText());
+            final String client = String.valueOf(selectClient.getText());
+
+            @Override
+            public void onClick(View v) {
+                if (fieldCheck(address, type, unit, floor, numRoom, numBathroom,
+                        numFloor, area, laundry, numParkingSpot, rent)) {
+                    if (!originalRent.equals(rent)) {
+                        if ((client.equals("")) || (Objects.isNull(client))) {
+                            Toast.makeText(getApplicationContext(), "Cannot update rent if client assigned.", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            updateDoc();
+                        }
+                    }
+                    else {
+                        if ((client.equals("")) || (Objects.isNull(client)) && (!mgr.equals("")) || (Objects.isNull(mgr))) {
+                            Toast.makeText(getApplicationContext(), "Cannot invite manager if no clients assigned.", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            updateDoc();
+                        }
+                    }
+
+                }
+            }
+            public void updateDoc() {
+                firestore.collection("properties")
+                        .whereEqualTo(FieldPath.documentId(), propertyDocId)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                    // Assuming there is only one document with the given ID
+                                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                    DocumentReference reference = document.getReference();
+                                    reference.update("address", address,
+                                            "type", type,
+                                            "unit", unit,
+                                            "floor", floor,
+                                            "numRoom", numRoom,
+                                            "numBathroom", numBathroom,
+                                            "numFloor", numFloor,
+                                            "area", area,
+                                            "laundry", laundry,
+                                            "numParkingSpot", numParkingSpot,
+                                            "rent", rent,
+                                            "manager", mgr,
+                                            "client", client).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("EditPropertyActivity:", "Property successfully updated!");
+                                                    }
+                                                })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("EditPropertyActivity:", "Error updating property", e);
+                                                }
+                                            });
+
+                                } else {
+                                    // Show a toast if no property is found with the given address
+                                    Toast.makeText(getApplicationContext(), "No property found with the given address.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
         });
 
@@ -333,10 +419,10 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
     private boolean fieldCheck(
             String address, String type, String unit, String floor, String numRoom, String numBathroom,
             String numFloor, String area, String laundry, String numParkingSpot,
-            String rent, String landlord, String manager, String client) {
+            String rent) {
 
         // field checking logic goes here...
-        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty() || landlord.isEmpty() || manager.isEmpty() || client.isEmpty());
+        return !(address.isEmpty() || type.isEmpty() ||( type.equals("apartment") && floor.isEmpty()) ||( type.equals("apartment") && unit.isEmpty())|| numRoom.isEmpty() || numBathroom.isEmpty() || numFloor.isEmpty() || area.isEmpty() || laundry.isEmpty() || numParkingSpot.isEmpty() || rent.isEmpty());
     }
 
 }

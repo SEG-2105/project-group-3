@@ -39,6 +39,7 @@ public class PropertyCreator extends Application {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
                     Toast.makeText(context, "Property registration success! (collection)", Toast.LENGTH_LONG).show();
+                    documentReference.getId();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

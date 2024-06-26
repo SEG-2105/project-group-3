@@ -1,11 +1,15 @@
 package ca.uottawa.team3.rentron;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +42,7 @@ import ca.uottawa.team3.rentron.Properties.Property;
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
     Button btnProperty;
-    List<Property> properties;
+    List<Property> properties = new ArrayList<>();
     ListView listViewProperties;
     FirebaseFirestore firestore;
 
@@ -131,10 +135,12 @@ public class PropertiesActivity extends AppCompatActivity {
                                     if (db_property.getLandlord().equals(email)){
                                         properties.add(db_property);
                                     }
-                                } else {
+                                } else if (role.equals("client")) {
                                     if (db_property.getClient().isEmpty() && !db_property.getManager().isEmpty()){
                                         properties.add(db_property);
                                     }
+                                } else {
+                                    properties.add(db_property);
                                 }
 
                                 //Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
@@ -179,11 +185,32 @@ public class PropertiesActivity extends AppCompatActivity {
                     startActivityForResult(intent, 0);
                 }
                 else {
-                    Toast.makeText(getApplicationContext(), "Can't edit this property, you do not own/manage it.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Can't edit this property, you do not own it.", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
         });
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
+                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        //LayoutInflater inflater = null;
+        //View dialogView = inflater.inflate(R.layout.layout_property_item, null);
+        //dialogBuilder.setView(dialogView);
+        if (role.equals("client")) {
+            listViewProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    ArrayList<Property> property = new ArrayList<>();
+                    property.add(properties.get(position));
+                    PropertyDialogListAdapter dialogView = new PropertyDialogListAdapter(PropertiesActivity.this, property);
+                    dialogBuilder.setAdapter(dialogView, null)
+                            .setTitle(properties.get(position).getAddress()).create().show();
+                }
+            });
+        }
     }
 
     @Override

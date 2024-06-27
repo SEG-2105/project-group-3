@@ -131,10 +131,12 @@ public class PropertiesActivity extends AppCompatActivity {
                                         (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
                                         (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
                                         (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
+                                //if the role is landlord, filters properties that are owned by the landlord
                                 if (role.equals("landlord")) {
                                     if (db_property.getLandlord().equals(email)){
                                         properties.add(db_property);
                                     }
+                                //if role is client, filters properties that are managed and vacant
                                 } else if (role.equals("client")) {
                                     if (db_property.getClient().isEmpty() && !db_property.getManager().isEmpty()){
                                         properties.add(db_property);
@@ -147,8 +149,14 @@ public class PropertiesActivity extends AppCompatActivity {
                             }
 
                             if (role.equals("landlord")) {
-                                // Create the adapter
+                                // Create the landlord specific adapter
                                 PropertyListLandlord propertiesAdapter = new PropertyListLandlord(PropertiesActivity.this, properties);
+
+                                // Attach the adapter to the list view
+                                listViewProperties.setAdapter(propertiesAdapter);
+                            } else if(role.equals("client")){
+                                // Create the client specific adapter
+                                PropertyListClient propertiesAdapter = new PropertyListClient(PropertiesActivity.this, properties);
 
                                 // Attach the adapter to the list view
                                 listViewProperties.setAdapter(propertiesAdapter);
@@ -190,15 +198,14 @@ public class PropertiesActivity extends AppCompatActivity {
                 return true;
             }
         });
+        //Box that appears for client when clicking on a property
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
                 .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        //LayoutInflater inflater = null;
-        //View dialogView = inflater.inflate(R.layout.layout_property_item, null);
-        //dialogBuilder.setView(dialogView);
+        //Viewing full details of a property only; available to client
         if (role.equals("client")) {
             listViewProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

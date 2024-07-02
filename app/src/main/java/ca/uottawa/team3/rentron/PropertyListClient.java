@@ -28,7 +28,7 @@ public class PropertyListClient extends ArrayAdapter<Property> {
         View listViewItem = inflater.inflate(R.layout.layout_property_item_client, null, true);
 
         TextView address = listViewItem.findViewById(R.id.textViewAddress);
-        TextView type = listViewItem.findViewById(R.id.textViewType);
+        TextView type = listViewItem.findViewById(R.id.textViewClient);
         TextView rent = listViewItem.findViewById(R.id.textViewRent);
 
         Property property = properties.get(position);

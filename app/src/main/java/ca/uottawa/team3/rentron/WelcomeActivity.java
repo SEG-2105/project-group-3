@@ -1,6 +1,5 @@
 package ca.uottawa.team3.rentron;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +8,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +29,8 @@ import java.io.UnsupportedEncodingException;
 
 public class WelcomeActivity extends AppCompatActivity {
     private SharedPreferences pref;
-    private String firstName, lastName, role;
+    private String firstName, lastName, role, email;
+    private ListView activeApplications;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -48,36 +49,64 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-//        String role = activeRole;
-//        String email = activeEmail;
+        role = activeRole;
+        email = activeEmail;
 
-        setContentView(R.layout.activity_welcome);
 
-        TextView welcomeText = findViewById(R.id.welcomeTextView);
-        TextView roleText = findViewById(R.id.roleTextView);
+        if (activeRole.equals("landlord")) {
+            setContentView(R.layout.activity_welcome_landlord);
 
-        db.collection("users").whereEqualTo("email", activeEmail).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                if(task.getResult().isEmpty()) {
-                    Log.d("WELCOME:", "FAILURE TO IDENTIFY USER");
-                    Toast.makeText(getApplicationContext(), "Could not find active user???", Toast.LENGTH_LONG).show();
+            TextView welcomeText = findViewById(R.id.welcomeTextView);
+
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if(task.getResult().isEmpty()) {
+                        Log.d("WELCOME:", "FAILURE TO IDENTIFY USER");
+                        Toast.makeText(getApplicationContext(), "Could not find active user???", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        DocumentSnapshot user = task.getResult().getDocuments().get(0);
+                        firstName = (String)user.get("firstname");
+                        lastName = (String)user.get("lastname");
+                        //role = (String)user.get("role");
+                        String welcome = ("Welcome, " + firstName + " " + lastName + "!");
+                        welcomeText.setText(welcome);
+
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
                 }
-                else {
-                    DocumentSnapshot user = task.getResult().getDocuments().get(0);
-                    firstName = (String)user.get("firstname");
-                    lastName = (String)user.get("lastname");
-                    role = (String)user.get("role");
-                    //Toast.makeText(getApplicationContext(), "Got data!", Toast.LENGTH_LONG).show();
-                    String welcome = ("Welcome, " + firstName + " " + lastName + "!");
-                    String yourRole = ("Your role is: " + role);
-                    welcomeText.setText(welcome);
-                    roleText.setText(yourRole);
+            });
+        } else {
+            setContentView(R.layout.activity_welcome);
 
+            TextView welcomeText = findViewById(R.id.welcomeTextView);
+            TextView roleText = findViewById(R.id.applicationsTextView);
+
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if(task.getResult().isEmpty()) {
+                        Log.d("WELCOME:", "FAILURE TO IDENTIFY USER");
+                        Toast.makeText(getApplicationContext(), "Could not find active user???", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        DocumentSnapshot user = task.getResult().getDocuments().get(0);
+                        firstName = (String)user.get("firstname");
+                        lastName = (String)user.get("lastname");
+                        //role = (String)user.get("role");
+                        //Toast.makeText(getApplicationContext(), "Got data!", Toast.LENGTH_LONG).show();
+                        String welcome = ("Welcome, " + firstName + " " + lastName + "!");
+                        String yourRole = ("Your role is: " + role);
+                        welcomeText.setText(welcome);
+                        roleText.setText(yourRole);
+
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }
+
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
@@ -115,7 +144,34 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onStart();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.welcome);
-        
+
+        if (role.equals("landlord")) {
+            activeApplications = findViewById(R.id.applicationList);
+            //need requests collection to be created
+            /*db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if(task.getResult().isEmpty()) {
+                        Log.d("WELCOME:", "FAILURE TO GET REQUESTS");
+                        Toast.makeText(getApplicationContext(), "Could not get active requests", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        DocumentSnapshot user = task.getResult().getDocuments().get(0);
+                        firstName = (String)user.get("firstname");
+                        lastName = (String)user.get("lastname");
+                        //role = (String)user.get("role");
+                        //Toast.makeText(getApplicationContext(), "Got data!", Toast.LENGTH_LONG).show();
+                        String welcome = ("Welcome, " + firstName + " " + lastName + "!");
+                        String yourRole = ("Your role is: " + role);
+                        welcomeText.setText(welcome);
+                        roleText.setText(yourRole);
+
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
+                }
+            });*/
+        }
+
     }
 
     // disable animations when leaving activity (intended for when Back button is pressed)

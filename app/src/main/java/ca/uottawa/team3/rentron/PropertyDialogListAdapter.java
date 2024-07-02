@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
@@ -29,7 +28,7 @@ public class PropertyDialogListAdapter  extends ArrayAdapter<Property> {
         View listViewItem = inflater.inflate(R.layout.layout_property_item_dialog, null, true);
 
         //TextView address = listViewItem.findViewById(R.id.textViewAddress);
-        TextView type = listViewItem.findViewById(R.id.textViewType);
+        TextView type = listViewItem.findViewById(R.id.textViewClient);
         TextView floor = listViewItem.findViewById(R.id.textViewFloor);
         TextView numRooms = listViewItem.findViewById(R.id.textViewNumberOfRooms);
         TextView numBathrooms = listViewItem.findViewById(R.id.textViewNumberOfBathrooms);

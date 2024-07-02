@@ -37,16 +37,21 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_welcome);
-
         byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);;
 
         String activeEmail = "";
+        String activeRole = "";
         try {
             activeEmail = new String(active, "UTF-8");
+            activeRole = new String(active1, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+//        String role = activeRole;
+//        String email = activeEmail;
+
+        setContentView(R.layout.activity_welcome);
 
         TextView welcomeText = findViewById(R.id.welcomeTextView);
         TextView roleText = findViewById(R.id.roleTextView);
@@ -110,6 +115,7 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onStart();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.welcome);
+        
     }
 
     // disable animations when leaving activity (intended for when Back button is pressed)

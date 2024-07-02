@@ -199,12 +199,7 @@ public class PropertiesActivity extends AppCompatActivity {
             }
         });
         //Box that appears for client when clicking on a property
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
-                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         //Viewing full details of a property only; available to client
         if (role.equals("client")) {
             listViewProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -214,7 +209,20 @@ public class PropertiesActivity extends AppCompatActivity {
                     property.add(properties.get(position));
                     PropertyDialogListAdapter dialogView = new PropertyDialogListAdapter(PropertiesActivity.this, property);
                     dialogBuilder.setAdapter(dialogView, null)
-                            .setTitle(properties.get(position).getAddress()).create().show();
+                                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //send request method(properties.get(position),...)
+
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setTitle(properties.get(position).getAddress()).create().show();
                 }
             });
         }

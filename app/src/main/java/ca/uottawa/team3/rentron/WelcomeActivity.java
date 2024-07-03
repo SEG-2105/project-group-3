@@ -1,6 +1,8 @@
 package ca.uottawa.team3.rentron;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +10,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,16 +25,29 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Users.Tickets.Courier;
+import ca.uottawa.team3.rentron.Users.Tickets.Request;
 
 public class WelcomeActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private String firstName, lastName, role, email;
-    private ListView activeApplications;
+    private List<Request> requests = new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -144,32 +161,126 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onStart();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.welcome);
+        // Clear the previous list
+        requests.clear();
+        db = FirebaseFirestore.getInstance();
 
         if (role.equals("landlord")) {
-            activeApplications = findViewById(R.id.applicationList);
-            //need requests collection to be created
-            /*db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+            Toast.makeText(getApplicationContext(), "Creating application list.", Toast.LENGTH_SHORT).show();
+            ListView activeApplications = findViewById(R.id.applicationListView);
+            db.collection("requests").whereEqualTo("idLandlord", email).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    if(task.getResult().isEmpty()) {
-                        Log.d("WELCOME:", "FAILURE TO GET REQUESTS");
-                        Toast.makeText(getApplicationContext(), "Could not get active requests", Toast.LENGTH_LONG).show();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d("WelcomeActivity:", document.getId() + " => " + document.get("property"));
+                        Request db_request = new Request((String)document.get("idClient"), (String)document.get("idLandlord"), (String)document.get("property"));
+                        requests.add(db_request);
                     }
-                    else {
-                        DocumentSnapshot user = task.getResult().getDocuments().get(0);
-                        firstName = (String)user.get("firstname");
-                        lastName = (String)user.get("lastname");
-                        //role = (String)user.get("role");
-                        //Toast.makeText(getApplicationContext(), "Got data!", Toast.LENGTH_LONG).show();
-                        String welcome = ("Welcome, " + firstName + " " + lastName + "!");
-                        String yourRole = ("Your role is: " + role);
-                        welcomeText.setText(welcome);
-                        roleText.setText(yourRole);
+                    // Create the landlord specific adapter
+                    RequestListAdapter propertiesAdapter = new RequestListAdapter(WelcomeActivity.this, requests);
 
-                    }
+                    // Attach the adapter to the list view
+                    activeApplications.setAdapter(propertiesAdapter);
+                    Toast.makeText(getApplicationContext(), "Application list created!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
                 }
-            });*/
+            });
+
+            //Box that appears for landlord when clicking on a request
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            //Viewing full details of a property only; available to client
+                activeApplications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        ArrayList<Request> request = new ArrayList<>();
+                        request.add(requests.get(position));
+                        RequestListAdapter dialogView = new RequestListAdapter(WelcomeActivity.this, request);
+                        dialogBuilder.setAdapter(dialogView, null)
+                                .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        //edit property to add client
+
+                                        db.collection("requests")
+                                                .whereEqualTo("idLandlord", requests.get(position).getLandlord())
+                                                .whereEqualTo("property", requests.get(position).getProperty())
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                                Log.d("WelcomeActivity:", doc.getId() + " => " + doc.get("property"));
+                                                                doc.getReference().delete()
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Toast.makeText(getApplicationContext(), "Requests removed successfully.", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                Toast.makeText(getApplicationContext(), "Failed to remove requests.", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+                                                            }
+
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "No request found.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+
+                                        dialog.dismiss();
+                                    }
+                                }).setNeutralButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        db.collection("requests")
+                                                .whereEqualTo("idLandlord", requests.get(position).getLandlord())
+                                                .whereEqualTo("idClient", requests.get(position).getClient())
+                                                .whereEqualTo("property", requests.get(position).getProperty())
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                                Log.d("WelcomeActivity:", doc.getId() + " => " + doc.get("property"));
+                                                                doc.getReference().delete()
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Toast.makeText(getApplicationContext(), "Request rejected successfully.", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Toast.makeText(getApplicationContext(), "Failed to reject request.", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+                                                            }
+
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "No request found.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setTitle(requests.get(position).getProperty()).create().show();
+                    }
+                });
         }
 
     }

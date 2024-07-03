@@ -157,27 +157,10 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
-    private void refreshRequests() {
-        requests.clear();
-        db = FirebaseFirestore.getInstance();
-
-        db.collection("requests").whereEqualTo("idLandlord", email).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("WelcomeActivity:", document.getId() + " => " + document.get("property"));
-                    Request db_request = new Request((String)document.get("idClient"), (String)document.get("idLandlord"), (String)document.get("property"));
-                    requests.add(db_request);
-                }
-                // Create the landlord specific adapter
-                RequestListAdapter propertiesAdapter = new RequestListAdapter(WelcomeActivity.this, requests);
-
-                // Attach the adapter to the list view
-                activeApplications.setAdapter(propertiesAdapter);
-                Toast.makeText(getApplicationContext(), "Application list created!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void refresh() {
+        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+        startActivityForResult(intent,0);
+        finish();
     }
 
     // ensure that navigation view is in correct position when returning to activity (via Back button)
@@ -285,11 +268,44 @@ public class WelcomeActivity extends AppCompatActivity {
                                                         }
                                                     }
                                                 });
+
+                                        db.collection("requests")
+                                                .whereEqualTo("idClient", requests.get(position).getClient())
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                                Log.d("WelcomeActivity:", doc.getId() + " => " + doc.get("property"));
+                                                                doc.getReference().delete()
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Toast.makeText(getApplicationContext(), "Requests removed successfully.", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                Toast.makeText(getApplicationContext(), "Failed to remove requests.", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+                                                            }
+
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "No request found.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+
+                                        refresh();
                                         dialog.dismiss();
                                     }
                                 }).setNeutralButton("Close", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        refresh();
                                         dialog.dismiss();
                                     }
                                 })
@@ -327,13 +343,14 @@ public class WelcomeActivity extends AppCompatActivity {
                                                     }
                                                 });
 
+                                        refresh();
                                         dialog.dismiss();
                                     }
                                 })
 //                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
 //                                    @Override
 //                                    public void onDismiss(DialogInterface dialog) {
-//                                        refreshRequests();
+//                                        refresh();
 //                                    }
 //                                })
                                 .setTitle(requests.get(position).getProperty()).create().show();

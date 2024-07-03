@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,6 +49,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private String firstName, lastName, role, email;
     private List<Request> requests = new ArrayList<>();
+    private ListView activeApplications;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -155,6 +157,29 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshRequests() {
+        requests.clear();
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("requests").whereEqualTo("idLandlord", email).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d("WelcomeActivity:", document.getId() + " => " + document.get("property"));
+                    Request db_request = new Request((String)document.get("idClient"), (String)document.get("idLandlord"), (String)document.get("property"));
+                    requests.add(db_request);
+                }
+                // Create the landlord specific adapter
+                RequestListAdapter propertiesAdapter = new RequestListAdapter(WelcomeActivity.this, requests);
+
+                // Attach the adapter to the list view
+                activeApplications.setAdapter(propertiesAdapter);
+                Toast.makeText(getApplicationContext(), "Application list created!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     // ensure that navigation view is in correct position when returning to activity (via Back button)
     @Override
     public void onStart() {
@@ -166,8 +191,8 @@ public class WelcomeActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         if (role.equals("landlord")) {
-            Toast.makeText(getApplicationContext(), "Creating application list.", Toast.LENGTH_SHORT).show();
-            ListView activeApplications = findViewById(R.id.applicationListView);
+            //Toast.makeText(getApplicationContext(), "Creating application list.", Toast.LENGTH_SHORT).show();
+            activeApplications = findViewById(R.id.applicationListView);
             db.collection("requests").whereEqualTo("idLandlord", email).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -180,7 +205,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     // Attach the adapter to the list view
                     activeApplications.setAdapter(propertiesAdapter);
-                    Toast.makeText(getApplicationContext(), "Application list created!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
                 }
@@ -201,6 +225,35 @@ public class WelcomeActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int which) {
 
                                         //edit property to add client
+                                        db.collection("properties")
+                                                .whereEqualTo("address", requests.get(position).getProperty())
+                                                .whereEqualTo("landlord", requests.get(position).getLandlord())
+                                                .get()
+                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                                            // Assuming there is only one document with the given address
+                                                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                                            DocumentReference reference = document.getReference();
+                                                            reference.update("client",requests.get(position).getClient()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Log.d("WelcomeActivity:", "Request successfully accepted!");
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.w("WelcomeActivity:", "Error accepting request", e);
+                                                                        }
+                                                                    });
+
+                                                        } else {
+                                                            Toast.makeText(getApplicationContext(), "No request found.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
 
                                         db.collection("requests")
                                                 .whereEqualTo("idLandlord", requests.get(position).getLandlord())
@@ -232,7 +285,6 @@ public class WelcomeActivity extends AppCompatActivity {
                                                         }
                                                     }
                                                 });
-
                                         dialog.dismiss();
                                     }
                                 }).setNeutralButton("Close", new DialogInterface.OnClickListener() {
@@ -278,6 +330,12 @@ public class WelcomeActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 })
+//                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                    @Override
+//                                    public void onDismiss(DialogInterface dialog) {
+//                                        refreshRequests();
+//                                    }
+//                                })
                                 .setTitle(requests.get(position).getProperty()).create().show();
                     }
                 });

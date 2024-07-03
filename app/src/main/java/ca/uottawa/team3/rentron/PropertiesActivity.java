@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Users.Tickets.*;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
@@ -46,10 +47,28 @@ public class PropertiesActivity extends AppCompatActivity {
     ListView listViewProperties;
     FirebaseFirestore firestore;
 
+    String role, email;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
+
+        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
+
+        String activeEmail = "";
+        String activeRole = "";
+        try {
+            activeEmail = new String(active, "UTF-8");
+            activeRole = new String(active1, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        role = activeRole;
+        email = activeEmail;
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_properties);
         properties = new ArrayList<Property>();
@@ -102,19 +121,19 @@ public class PropertiesActivity extends AppCompatActivity {
 
         btnProperty = findViewById(R.id.btnViewProperty);
 
-        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
-        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
-
-        String activeEmail = "";
-        String activeRole = "";
-        try {
-            activeEmail = new String(active, "UTF-8");
-            activeRole = new String(active1, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        String role = activeRole;
-        String email = activeEmail;
+//        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+//        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
+//
+//        String activeEmail = "";
+//        String activeRole = "";
+//        try {
+//            activeEmail = new String(active, "UTF-8");
+//            activeRole = new String(active1, "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            throw new RuntimeException(e);
+//        }
+//        String role = activeRole;
+//        String email = activeEmail;
 
         if (role.equals("landlord")) {
             btnProperty.setVisibility(View.VISIBLE);
@@ -212,7 +231,11 @@ public class PropertiesActivity extends AppCompatActivity {
                                 .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        //send request method(properties.get(position),...)
+                                        Property property = properties.get(position);
+                                        Request request = new Request(email, property.getLandlord(), property.getAddress());
+
+                                        Courier courier = new Courier(getApplicationContext(), firestore);
+                                        courier.send(request);
 
                                         dialog.dismiss();
                                     }

@@ -14,4 +14,9 @@ public class Ticket extends Request {
     public String getText() {
         return (String) ticketData.get("text");
     }
+
+    @Override
+    public boolean isValid() {
+        return !(this.getClient().isEmpty() || this.getLandlord().isEmpty() || this.getProperty().isEmpty() || this.getText().isEmpty());
+    }
 }

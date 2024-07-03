@@ -6,6 +6,7 @@ public class Request {
     private HashMap<String, Object> requestData;
 
     public Request(String idClient, String idLandlord, String property) {
+        requestData = new HashMap<>();
         this.requestData.put("idClient", idClient);
         this.requestData.put("idLandlord", idLandlord);
         this.requestData.put("property", property);
@@ -21,5 +22,9 @@ public class Request {
     }
     public HashMap<String, Object> getRequestData() {
         return (HashMap<String, Object>) requestData;
+    }
+
+    public boolean isValid() {
+        return !(this.getClient().isEmpty() || this.getLandlord().isEmpty() || this.getProperty().isEmpty());
     }
 }

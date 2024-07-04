@@ -51,7 +51,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private String firstName, lastName, role, email;
     private List<Request> activeRequests = new ArrayList<>();
     private List<Request> rejectedRequests = new ArrayList<>();
-    private ListView activeApplications, rejectedApplications;
+    private List<Property> tenantProperties = new ArrayList<>();
+    private ListView activeApplications, rejectedApplications, tenantPropertiesView;
     //private RequestListAdapter adapter; // used when refreshing list
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -77,6 +78,30 @@ public class WelcomeActivity extends AppCompatActivity {
 
         if (activeRole.equals("landlord")) {
             setContentView(R.layout.activity_welcome_landlord);
+
+            TextView welcomeText = findViewById(R.id.welcomeTextView);
+
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if(task.getResult().isEmpty()) {
+                        Log.d("WELCOME:", "FAILURE TO IDENTIFY USER");
+                        Toast.makeText(getApplicationContext(), "Could not find active user???", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        DocumentSnapshot user = task.getResult().getDocuments().get(0);
+                        firstName = (String)user.get("firstname");
+                        lastName = (String)user.get("lastname");
+                        //role = (String)user.get("role");
+                        String welcome = ("Welcome, " + firstName + " " + lastName + "!");
+                        welcomeText.setText(welcome);
+
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else if (activeRole.equals("client")) {
+            setContentView(R.layout.activity_welcome_client);
 
             TextView welcomeText = findViewById(R.id.welcomeTextView);
 
@@ -214,6 +239,45 @@ public class WelcomeActivity extends AppCompatActivity {
 //                    rejectedRequestAdapter.notifyDataSetChanged();
 //                }
 //            });
+        } else if (role.equals("client")) {
+            // Clear the previous list
+            tenantProperties.clear();
+            db = FirebaseFirestore.getInstance();
+            //Toast.makeText(getApplicationContext(), "Creating application list.", Toast.LENGTH_SHORT).show();
+            tenantPropertiesView = findViewById(R.id.tenantListView);
+            db.collection("properties")
+                    .whereEqualTo("client", email)
+                    .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("WelcomeActivity:", document.getId() + " => " + document.get("address"));
+                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
+                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
+                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
+                                        (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
+                                tenantProperties.add(db_property);
+                                Log.d("WelcomeActivity:", db_property.getLandlord() + " (db_property)");
+                            }
+                            if (!tenantProperties.isEmpty()) {
+                                // Create the client-tenant specific adapter
+                                PropertyListClient tenantViewAdapter = new PropertyListClient(WelcomeActivity.this, tenantProperties);
+
+                                // Attach the adapter to the tenant's list view
+                                tenantPropertiesView.setAdapter(tenantViewAdapter);
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            tenantPropertiesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), TicketsActivity.class);
+                    intent.putExtra("address", tenantProperties.get(position).getAddress());
+                    startActivityForResult (intent,0);
+                    return true;
+                }
+            });
         }
     }
 

@@ -352,6 +352,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         .setTitle(requests.get(position).getProperty()).create().show();
             }
         });
+
     }
 
     private void signOut() {

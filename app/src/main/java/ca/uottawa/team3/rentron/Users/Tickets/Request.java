@@ -10,6 +10,7 @@ public class Request {
         this.requestData.put("idClient", idClient);
         this.requestData.put("idLandlord", idLandlord);
         this.requestData.put("property", property);
+        this.requestData.put("rejected", false);
     }
     public String getClient() {
         return (String)this.requestData.get("idClient");

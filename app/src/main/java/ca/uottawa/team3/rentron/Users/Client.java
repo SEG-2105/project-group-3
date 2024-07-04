@@ -16,6 +16,7 @@ public class Client extends User { // least privileged type of user
         super(firstName, lastName, email);
         userData.put("birthyear", birthYear);
         userData.put("role", "client");
+        userData.put("isTenant", false);
         userData.put("password", "");
         userData.put("salt", "");
     }

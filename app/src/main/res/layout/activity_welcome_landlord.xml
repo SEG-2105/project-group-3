@@ -54,18 +54,6 @@
         <ListView
             android:id="@+id/applicationListView"
             android:layout_width="match_parent"
-            android:layout_height="245dp" />
-
-        <TextView
-            android:id="@+id/rejectedTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Rejected Applications"
-            android:textSize="16sp" />
-
-        <ListView
-            android:id="@+id/rejectedListView"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>

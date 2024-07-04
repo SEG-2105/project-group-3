@@ -175,7 +175,6 @@ public class WelcomeActivity extends AppCompatActivity {
             db = FirebaseFirestore.getInstance();
             //Toast.makeText(getApplicationContext(), "Creating application list.", Toast.LENGTH_SHORT).show();
             activeApplications = findViewById(R.id.applicationListView);
-            rejectedApplications = findViewById(R.id.rejectedListView);
             db.collection("requests")
                     .whereEqualTo("idLandlord", email)
                     .get().addOnCompleteListener(task -> {
@@ -194,11 +193,11 @@ public class WelcomeActivity extends AppCompatActivity {
 
                             // Attach the adapter to the list view
                             activeApplications.setAdapter(activeRequestAdapter);
-
-                            RequestListAdapter rejectedRequestAdapter = new RequestListAdapter(WelcomeActivity.this, rejectedRequests);
-
-                            // Attach the adapter to the list view
-                            rejectedApplications.setAdapter(rejectedRequestAdapter);
+//
+//                            RequestListAdapter rejectedRequestAdapter = new RequestListAdapter(WelcomeActivity.this, rejectedRequests);
+//
+//                            // Attach the adapter to the list view
+//                            rejectedApplications.setAdapter(rejectedRequestAdapter);
                         } else {
                             Toast.makeText(getApplicationContext(), "An error has occurred while fetching requests.", Toast.LENGTH_SHORT).show();
                         }
@@ -289,6 +288,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                                 db.collection("requests")
                                         .whereEqualTo("idClient", req.getClient())
+                                        .whereEqualTo("rejected", false)
                                         .get()
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
@@ -296,7 +296,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                                                     for (QueryDocumentSnapshot doc : task.getResult()) {
                                                         Log.d("WelcomeActivity:", doc.getId() + " => " + doc.get("property"));
-                                                        doc.getReference().update("rejected",true).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        doc.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
                                                                         Log.d("WelcomeActivity:", "Requests rejected!");

@@ -8,8 +8,11 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class Courier extends Application {
     Context context;
@@ -20,8 +23,8 @@ public class Courier extends Application {
         this.firestore = firestore;
     }
 
-    // send specified request to designated firebase collections (based on type)
-    public void send(Request request) {
+    // send specified Request to designated firebase collections (based on type)
+    public void sendRequest(Request request) {
         if(!request.isValid()) {
             Toast.makeText(context, "Specified request is invalid, make sure all fields are populated.", Toast.LENGTH_SHORT).show();
         }
@@ -30,7 +33,7 @@ public class Courier extends Application {
         }
         else {
             // make sure request is being directed into correct collection
-            String type = getCollectionType(request);
+            String type = "requests"; // SET TO CONSTANT AFTER CHANGED TO sendRequest(request)
 
             firestore.collection(type).add(request.getRequestData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
@@ -44,6 +47,19 @@ public class Courier extends Application {
                 }
             });
         }
+    }
+
+    // Needs actual implementation (code from WelcomeActivity should be moved here)
+    public void acceptRequest(Request request) {
+        // first, get client's name
+        String clientEmail = request.getClient();
+        String landlordEmail = request.getLandlord();
+        CollectionReference dbClient = firestore.collection("requests");
+        //...
+
+        CollectionReference db = firestore.collection("requests");
+        Task<QuerySnapshot> query; //...
+        //... Unfinished.
     }
 
     // Needs actual implementation, commented out code is unfinished

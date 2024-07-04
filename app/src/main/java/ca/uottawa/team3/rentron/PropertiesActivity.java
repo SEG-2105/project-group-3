@@ -235,7 +235,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                         Request request = new Request(email, property.getLandlord(), property.getAddress());
 
                                         Courier courier = new Courier(getApplicationContext(), firestore);
-                                        courier.send(request);
+                                        courier.sendRequest(request);
 
                                         dialog.dismiss();
                                     }

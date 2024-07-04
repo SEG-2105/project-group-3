@@ -37,6 +37,4 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
 
         return listViewItem;
     }
-
-
 }

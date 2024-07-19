@@ -42,7 +42,7 @@ import ca.uottawa.team3.rentron.Users.Tickets.*;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
-    Button btnProperty;
+    Button btnProperty, btnSearch;
     List<Property> properties = new ArrayList<>();
     ListView listViewProperties;
     FirebaseFirestore firestore;
@@ -120,6 +120,7 @@ public class PropertiesActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         btnProperty = findViewById(R.id.btnViewProperty);
+        btnSearch = findViewById(R.id.btnPropertySearch);
 
 //        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
 //        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
@@ -137,6 +138,8 @@ public class PropertiesActivity extends AppCompatActivity {
 
         if (role.equals("landlord")) {
             btnProperty.setVisibility(View.VISIBLE);
+        } else if (role.equals("client")) {
+            btnSearch.setVisibility(View.VISIBLE);
         }
 
         firestore.collection("properties").get()

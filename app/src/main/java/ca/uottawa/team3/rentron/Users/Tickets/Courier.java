@@ -24,18 +24,18 @@ public class Courier extends Application {
     }
 
     // send specified Request to designated firebase collections (based on type)
-    public void sendRequest(Request request) {
-        if(!request.isValid()) {
+    public void sendRequest(Message message) {
+        if(!message.isValid()) {
             Toast.makeText(context, "Specified request is invalid, make sure all fields are populated.", Toast.LENGTH_SHORT).show();
         }
-        else if (doesExist(request)) {
+        else if (doesExist(message)) {
             Toast.makeText(context, "Request already exists.", Toast.LENGTH_SHORT).show();
         }
         else {
             // make sure request is being directed into correct collection
             String type = "requests"; // SET TO CONSTANT AFTER CHANGED TO sendRequest(request)
 
-            firestore.collection(type).add(request.getRequestData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            firestore.collection(type).add(message.getData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
                     Toast.makeText(context, "TicketHandler: Ticket successfully sent!", Toast.LENGTH_SHORT).show();
@@ -63,7 +63,7 @@ public class Courier extends Application {
     }
 
     // Needs actual implementation, commented out code is unfinished
-    private boolean doesExist(Request request) {
+    private boolean doesExist(Message message) {
 //        String type = getCollectionType(request);
 //        CollectionReference db = firestore.collection(type);
 //        Task<QuerySnapshot> query;
@@ -92,10 +92,10 @@ public class Courier extends Application {
         return false;
     }
 
-    private String getCollectionType(Request request) {
-        if (request instanceof Invitation) {
+    private String getCollectionType(Message message) {
+        if (message instanceof Invitation) {
             return "invitations";
-        } else if (request instanceof Ticket) {
+        } else if (message instanceof Ticket) {
             return "tickets";
         } else {
             return "requests";

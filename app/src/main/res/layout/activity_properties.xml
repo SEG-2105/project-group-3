@@ -49,6 +49,13 @@
             android:layout_weight="0"
             android:text="@string/property_register"
             android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnPropertySearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Advanced Search" />
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

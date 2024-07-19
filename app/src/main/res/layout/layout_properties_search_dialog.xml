@@ -307,7 +307,7 @@
         android:textSize="18sp"
         android:textAlignment="center"
         android:gravity="center"
-        android:text="Utilities:"
+        android:text="Utilities Included:"
         android:textStyle="bold"/>
 
     <LinearLayout

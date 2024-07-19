@@ -1,8 +1,11 @@
 package ca.uottawa.team3.rentron;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
@@ -12,7 +15,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +29,14 @@ public class SearchActivity extends AppCompatActivity {
     List<Property> properties = new ArrayList<>();
     ListView listViewProperties;
     FirebaseFirestore firestore;
+    CollectionReference db;
 
     // Filters
-    String minFloors, minRooms, minBathrooms, minArea, minParkingSpots, minRent, maxRent;
+    String minFloors, minRooms, minBathrooms, minArea, minParkingSpots, minRent, maxRent, email;
     boolean basement, studio, apartment, townhouse, house, hydro, heating, water;
+
+    // search types
+    static boolean allTypes, allUtilities, byMinRent, byMaxRent, byRentRange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +64,27 @@ public class SearchActivity extends AppCompatActivity {
         hydro = getIntent().getBooleanExtra("hydro",false);
         heating = getIntent().getBooleanExtra("heating",false);
         water = getIntent().getBooleanExtra("water",false);
+        email = getIntent().getStringExtra("email");
+
+        // if no types were selected, searching for all types of housing
+        allTypes = !(basement || studio || apartment || townhouse || house);
+        allUtilities = !(hydro || heating || water); // same with utilities
+
+        // selecting how we are searching via rent
+        if (minRent.isEmpty()) {
+            byMinRent = true;
+            byMaxRent = false;
+            byRentRange = false;
+        } else if (maxRent.isEmpty()) {
+            byMinRent = false;
+            byMaxRent = true;
+            byRentRange = false;
+        } else {
+            byMinRent = false;
+            byMaxRent = false;
+            byRentRange = true;
+        }
+
 
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +112,55 @@ public class SearchActivity extends AppCompatActivity {
 
         // Iterate through all the properties
         firestore = FirebaseFirestore.getInstance();
-        // ...
+        //UNFINISHED
+        db = firestore.collection("properties");
+        Query search;
+        if (allTypes && allUtilities) {
+
+        }
+        //UNFINISHED
+
+        // below pulled from PropertiesActivity.java
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        listViewProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ArrayList<Property> property = new ArrayList<>();
+                property.add(properties.get(position));
+                PropertyDialogListAdapter dialogView = new PropertyDialogListAdapter(SearchActivity.this, property);
+                dialogBuilder.setAdapter(dialogView, null)
+                        .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Property property = properties.get(position);
+                                Request request = new Request(email, property.getLandlord(), property.getAddress());
+
+                                Courier courier = new Courier(getApplicationContext(), firestore);
+                                courier.sendRequest(request);
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setTitle(properties.get(position).getAddress()).create().show();
+            }
+        });
+    }
+
+
+    private void searchViaMinRent() {
+
+    }
+
+    private void searchViaMaxRent() {
+
+    }
+
+    private void searchViaRentRange() {
+
     }
 }

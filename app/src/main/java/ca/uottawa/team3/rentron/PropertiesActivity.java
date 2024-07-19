@@ -288,8 +288,8 @@ public class PropertiesActivity extends AppCompatActivity {
                 minBathroomsText.setText("0");
                 minAreaText.setText("0");
                 minParkingSpotsText.setText("0");
-                minRentText.setText("0");
-                maxRentText.setText("0");
+                //minRentText.setText("0");
+                //maxRentText.setText("0");
 
                 dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")
                         .setPositiveButton("Search", new DialogInterface.OnClickListener() {
@@ -313,6 +313,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                     intent.putExtra("hydro", utilitiesHydro.isChecked());
                                     intent.putExtra("heating", utilitiesHeating.isChecked());
                                     intent.putExtra("water", utilitiesWater.isChecked());
+                                    intent.putExtra("email",email);
                                     startActivityForResult(intent, 0);
                                     dialog.dismiss();
                                 } else {
@@ -341,7 +342,10 @@ public class PropertiesActivity extends AppCompatActivity {
                 toastFromDialog("Min. rent cannot be larger than max. rent.");
                 return false;
             } else if ((Double.parseDouble(minRent.getText().toString()) < 0) || (Double.parseDouble(maxRent.getText().toString()) < 0)) {
-                toastFromDialog("Rent cannot be below zero.");
+                toastFromDialog("Min. or max. rent cannot be below zero.");
+                return false;
+            } else if (Double.parseDouble(minRent.getText().toString()) == Double.parseDouble(maxRent.getText().toString())) {
+                toastFromDialog("Min. rent cannot equal max. rent.");
                 return false;
             } else {
                 int floors = Integer.parseInt(minFloors.getText().toString());
@@ -352,8 +356,14 @@ public class PropertiesActivity extends AppCompatActivity {
                 return ((floors >= 0) && (rooms >= 0) && (bathrooms >= 0) && (area >= 0) && (parking >= 0));
             }
         } catch (Exception e) {
-            toastFromDialog("Invalid numeric input.");
-            return false;
+            if (maxRent.getText().toString().isEmpty() && !minRent.getText().toString().isEmpty()) {
+                return true; // only sorting by min rent
+            } else if (!maxRent.getText().toString().isEmpty() && minRent.getText().toString().isEmpty()) {
+                return true; // only sorting by max rent
+            } else {
+                toastFromDialog("Invalid numeric input.");
+                return false;
+            }
         }
     }
 

@@ -220,8 +220,13 @@ public class PropertiesActivity extends AppCompatActivity {
                 return true;
             }
         });
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
+
         //Box that appears for client when clicking on a property
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder dialogBuilderSearch = new AlertDialog.Builder(this);
+
         //Viewing full details of a property only; available to client
         if (role.equals("client")) {
             listViewProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -252,6 +257,25 @@ public class PropertiesActivity extends AppCompatActivity {
                 }
             });
         }
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
+                dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")
+                        .setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                dialogBuilderSearch.create().show();
+            }
+        });
     }
 
     @Override

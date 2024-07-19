@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -261,11 +263,61 @@ public class PropertiesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
+                EditText minFloorsText, minRoomsText, minBathroomsText, minAreaText, minParkingSpotsText,
+                        minRentText, maxRentText;
+                CheckBox typeBasement, typeStudio, typeApartment, typeTownhouse, typeHouse,
+                    utilitiesHydro, utilitiesHeating, utilitiesWater;
+                minFloorsText = dialogViewSearch.findViewById(R.id.propertyNumFloors);
+                minRoomsText = dialogViewSearch.findViewById(R.id.propertyBedrooms);
+                minBathroomsText = dialogViewSearch.findViewById(R.id.propertyBathrooms);
+                minAreaText = dialogViewSearch.findViewById(R.id.propertyArea);
+                minParkingSpotsText = dialogViewSearch.findViewById(R.id.propertyParking);
+                minRentText = dialogViewSearch.findViewById(R.id.propertyMinRent);
+                maxRentText = dialogViewSearch.findViewById(R.id.propertyMaxRent);
+                typeBasement = dialogViewSearch.findViewById(R.id.propertyTypeBasement);
+                typeStudio = dialogViewSearch.findViewById(R.id.propertyTypeStudio);
+                typeApartment = dialogViewSearch.findViewById(R.id.propertyTypeApartment);
+                typeTownhouse = dialogViewSearch.findViewById(R.id.propertyTypeTownhouse);
+                typeHouse = dialogViewSearch.findViewById(R.id.propertyTypeHouse);
+                utilitiesHydro = dialogViewSearch.findViewById(R.id.propertyHydro);
+                utilitiesHeating = dialogViewSearch.findViewById(R.id.propertyHeating);
+                utilitiesWater = dialogViewSearch.findViewById(R.id.propertyWater);
+
+                minFloorsText.setText("0");
+                minRoomsText.setText("0");
+                minBathroomsText.setText("0");
+                minAreaText.setText("0");
+                minParkingSpotsText.setText("0");
+                minRentText.setText("0");
+                maxRentText.setText("0");
+
                 dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")
                         .setPositiveButton("Search", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
+                                if (areSearchFieldsValid(minRentText, maxRentText, minFloorsText, minRoomsText, minBathroomsText,
+                                        minAreaText, minParkingSpotsText)) {
+                                    Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                                    intent.putExtra("minFloors", minFloorsText.getText().toString());
+                                    intent.putExtra("minRooms", minRoomsText.getText().toString());
+                                    intent.putExtra("minBathrooms", minBathroomsText.getText().toString());
+                                    intent.putExtra("minArea", minAreaText.getText().toString());
+                                    intent.putExtra("minParkingSpots", minParkingSpotsText.getText().toString());
+                                    intent.putExtra("minRent", minRentText.getText().toString());
+                                    intent.putExtra("maxRent", maxRentText.getText().toString());
+                                    intent.putExtra("typeBasement", typeBasement.isChecked());
+                                    intent.putExtra("typeStudio", typeStudio.isChecked());
+                                    intent.putExtra("typeApartment", typeApartment.isChecked());
+                                    intent.putExtra("typeTownhouse", typeTownhouse.isChecked());
+                                    intent.putExtra("typeHouse", typeHouse.isChecked());
+                                    intent.putExtra("hydro", utilitiesHydro.isChecked());
+                                    intent.putExtra("heating", utilitiesHeating.isChecked());
+                                    intent.putExtra("water", utilitiesWater.isChecked());
+                                    startActivityForResult(intent, 0);
+                                    dialog.dismiss();
+                                } else {
+                                    dialog.dismiss();
+                                }
                             }
                         })
                         .setNegativeButton("Close", new DialogInterface.OnClickListener() {
@@ -276,6 +328,33 @@ public class PropertiesActivity extends AppCompatActivity {
                 dialogBuilderSearch.create().show();
             }
         });
+    }
+
+    private void toastFromDialog(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean areSearchFieldsValid(EditText minRent, EditText maxRent, EditText minFloors, EditText minRooms, EditText minBathrooms,
+                                         EditText minArea, EditText minParkingSpots) {
+        try {
+            if (Double.parseDouble(minRent.getText().toString()) > Double.parseDouble(maxRent.getText().toString())) {
+                toastFromDialog("Min. rent cannot be larger than max. rent.");
+                return false;
+            } else if ((Double.parseDouble(minRent.getText().toString()) < 0) || (Double.parseDouble(maxRent.getText().toString()) < 0)) {
+                toastFromDialog("Rent cannot be below zero.");
+                return false;
+            } else {
+                int floors = Integer.parseInt(minFloors.getText().toString());
+                int rooms = Integer.parseInt(minRooms.getText().toString());
+                int bathrooms = Integer.parseInt(minBathrooms.getText().toString());
+                double area = Double.parseDouble(minArea.getText().toString());
+                int parking = Integer.parseInt(minParkingSpots.getText().toString());
+                return ((floors >= 0) && (rooms >= 0) && (bathrooms >= 0) && (area >= 0) && (parking >= 0));
+            }
+        } catch (Exception e) {
+            toastFromDialog("Invalid numeric input.");
+            return false;
+        }
     }
 
     @Override

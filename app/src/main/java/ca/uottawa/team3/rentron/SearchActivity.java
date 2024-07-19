@@ -4,20 +4,26 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +39,10 @@ public class SearchActivity extends AppCompatActivity {
 
     // Filters
     String minFloors, minRooms, minBathrooms, minArea, minParkingSpots, minRent, maxRent, email;
-    boolean basement, studio, apartment, townhouse, house, hydro, heating, water;
+    boolean basement, studio, apartment, townhouse, house, hasHydro, hasHeating, hasWater;
 
-    // search types
-    static boolean allTypes, allUtilities, byMinRent, byMaxRent, byRentRange;
+    // search cases
+    static boolean allTypes, allUtilities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,28 +67,20 @@ public class SearchActivity extends AppCompatActivity {
         apartment = getIntent().getBooleanExtra("typeApartment",false);
         townhouse = getIntent().getBooleanExtra("typeTownhouse",false);
         house = getIntent().getBooleanExtra("typeHouse",false);
-        hydro = getIntent().getBooleanExtra("hydro",false);
-        heating = getIntent().getBooleanExtra("heating",false);
-        water = getIntent().getBooleanExtra("water",false);
+        hasHydro = getIntent().getBooleanExtra("hydro",false);
+        hasHeating = getIntent().getBooleanExtra("heating",false);
+        hasWater = getIntent().getBooleanExtra("water",false);
         email = getIntent().getStringExtra("email");
 
         // if no types were selected, searching for all types of housing
         allTypes = !(basement || studio || apartment || townhouse || house);
-        allUtilities = !(hydro || heating || water); // same with utilities
+        allUtilities = !(hasHydro || hasHeating || hasWater); // same with utilities
 
         // selecting how we are searching via rent
         if (minRent.isEmpty()) {
-            byMinRent = true;
-            byMaxRent = false;
-            byRentRange = false;
+            minRent = "0";
         } else if (maxRent.isEmpty()) {
-            byMinRent = false;
-            byMaxRent = true;
-            byRentRange = false;
-        } else {
-            byMinRent = false;
-            byMaxRent = false;
-            byRentRange = true;
+            maxRent = "999999"; // default value is set impossibly high since we are always searching in ranges
         }
 
 
@@ -106,19 +104,36 @@ public class SearchActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        listViewProperties = findViewById(R.id.listViewProperties);
+        listViewProperties = findViewById(R.id.propertyListView);
         // Clear the previous list
         properties.clear();
 
         // Iterate through all the properties
         firestore = FirebaseFirestore.getInstance();
-        //UNFINISHED
-        db = firestore.collection("properties");
-        Query search;
-        if (allTypes && allUtilities) {
 
-        }
-        //UNFINISHED
+        firestore.collection("properties").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
+                                Property db_property = new Property((String) document.get("address"), (String) document.get("type"), (String) document.get("unit"), (String) document.get("floor"),
+                                        (String) document.get("numRoom"), (String) document.get("numBathroom"), (String) document.get("numFloor"), (String) document.get("area"),
+                                        (String) document.get("laundry"), (String) document.get("numParkingSpot"), (String) document.get("rent"), (boolean) document.get("heating"), (boolean) document.get("hydro"), (boolean) document.get("water"),
+                                        (String) document.get("landlord"), (String) document.get("manager"), (String) document.get("client"));
+                                if (isPropertyValid(db_property)) {
+                                    properties.add(db_property);
+                                }
+                                // Create the client specific adapter
+                                PropertyListClient propertiesAdapter = new PropertyListClient(SearchActivity.this, properties);
+
+                                // Attach the adapter to the list view
+                                listViewProperties.setAdapter(propertiesAdapter);
+                            }
+                        }
+                    }
+                });
 
         // below pulled from PropertiesActivity.java
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -151,16 +166,51 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-
-    private void searchViaMinRent() {
-
+    private boolean propertyTypeCheck(Property property) {
+        String types[] = {"basement","studio","apartment","townhouse","house"};
+        return false;
     }
 
-    private void searchViaMaxRent() {
+    private boolean isPropertyValid(Property property) {
+        int rooms = Integer.parseInt(property.getNumRoom());
+        int floors = Integer.parseInt(property.getNumFloor());
+        int bathrooms = Integer.parseInt(property.getNumBathroom());
+        int area = Integer.parseInt(property.getArea());
+        int rent = Integer.parseInt(property.getRent());
+        int parkingSpots = Integer.parseInt(property.getNumParkingSpot());
+        String type = property.getType();
+        boolean heating = property.getHeating();
+        boolean water = property.getWater();
+        boolean hydro = property.getHydro();
 
+        boolean rentCheck = false;
+        boolean typeCheck = true;
+        boolean attributes = false;
+
+        // TYPE CHECK CASES NOT IMPLEMENTED YET!!
+        if (allTypes && allUtilities) {
+            attributes = (rooms >= Integer.parseInt(minRooms)) && (floors >= Integer.parseInt(minFloors)) && (bathrooms >= Integer.parseInt(minBathrooms))
+                    && (area >= Integer.parseInt(minArea)) && (rent >= Integer.parseInt(minRent)) && (parkingSpots >= Integer.parseInt(minParkingSpots));
+        } else if (allTypes) {
+            attributes = (rooms >= Integer.parseInt(minRooms)) && (floors >= Integer.parseInt(minFloors)) && (bathrooms >= Integer.parseInt(minBathrooms))
+                    && (area >= Integer.parseInt(minArea)) && (rent >= Integer.parseInt(minRent)) && (parkingSpots >= Integer.parseInt(minParkingSpots))
+                    && (heating == hasHeating) && (hydro == hasHydro) && (water == hasWater);
+        } else if (allUtilities) {
+            typeCheck = false;
+            attributes = (rooms >= Integer.parseInt(minRooms)) && (floors >= Integer.parseInt(minFloors)) && (bathrooms >= Integer.parseInt(minBathrooms))
+                    && (area >= Integer.parseInt(minArea)) && (rent >= Integer.parseInt(minRent)) && (parkingSpots >= Integer.parseInt(minParkingSpots));
+            typeCheck = propertyTypeCheck(property);
+        } else {
+            typeCheck = false;
+            attributes = (rooms >= Integer.parseInt(minRooms)) && (floors >= Integer.parseInt(minFloors)) && (bathrooms >= Integer.parseInt(minBathrooms))
+                    && (area >= Integer.parseInt(minArea)) && (rent >= Integer.parseInt(minRent)) && (parkingSpots >= Integer.parseInt(minParkingSpots))
+                    && (heating == hasHeating) && (hydro == hasHydro) && (water == hasWater);
+            typeCheck = propertyTypeCheck(property);
+        }
+
+        rentCheck = (rent >= Integer.parseInt(minRent)) && (rent <= Integer.parseInt(maxRent));
+
+        return (rentCheck && attributes && typeCheck);
     }
 
-    private void searchViaRentRange() {
-
-    }
 }

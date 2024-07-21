@@ -104,6 +104,7 @@ public class WelcomeActivity extends AppCompatActivity {
             setContentView(R.layout.activity_welcome_client);
 
             TextView welcomeText = findViewById(R.id.welcomeTextView);
+            Button requestsButton = findViewById(R.id.requestsButton);
 
             db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -124,6 +125,8 @@ public class WelcomeActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
                 }
             });
+        } else if (activeRole.equals("property-manager")) {
+            setContentView(R.layout.activity_welcome_manager);
         } else {
             setContentView(R.layout.activity_welcome);
 

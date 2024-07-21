@@ -20,7 +20,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
-        android:id="@+id/welcomeLayoutClient"
+        android:id="@+id/welcomeLayoutManager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="32dp"
@@ -44,21 +44,15 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/requestsButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View Request Status" />
-
         <TextView
-            android:id="@+id/tenantTextView"
+            android:id="@+id/requestsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your Rented Properties"
+            android:text="Active Requests"
             android:textSize="16sp" />
 
         <ListView
-            android:id="@+id/tenantListView"
+            android:id="@+id/requestListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

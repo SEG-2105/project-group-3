@@ -288,7 +288,7 @@ public class PropertiesActivity extends AppCompatActivity {
                 minBathroomsText.setText("0");
                 minAreaText.setText("0");
                 minParkingSpotsText.setText("0");
-                //minRentText.setText("0");
+                minRentText.setText("0");
                 //maxRentText.setText("0");
 
                 dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")

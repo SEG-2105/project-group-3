@@ -122,7 +122,8 @@ public class SearchActivity extends AppCompatActivity {
                                         (String) document.get("numRoom"), (String) document.get("numBathroom"), (String) document.get("numFloor"), (String) document.get("area"),
                                         (String) document.get("laundry"), (String) document.get("numParkingSpot"), (String) document.get("rent"), (boolean) document.get("heating"), (boolean) document.get("hydro"), (boolean) document.get("water"),
                                         (String) document.get("landlord"), (String) document.get("manager"), (String) document.get("client"));
-                                if (isPropertyValid(db_property)) {
+                                if (isPropertyValid(db_property) && !db_property.getClient().equals(email)) // this search will NOT show already rented properties
+                                {
                                     properties.add(db_property);
                                 }
                                 // Create the client specific adapter
@@ -167,8 +168,21 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private boolean propertyTypeCheck(Property property) {
-        String types[] = {"basement","studio","apartment","townhouse","house"};
-        return false;
+        String propertyType = property.getType();
+        switch (propertyType) {
+            case "Basement":
+                return basement;
+            case "Studio":
+                return studio;
+            case "Apartment":
+                return apartment;
+            case "Townhouse":
+                return townhouse;
+            case "House":
+                return house;
+            default:
+                throw new IllegalStateException("Unexpected value: " + propertyType);
+        }
     }
 
     private boolean isPropertyValid(Property property) {

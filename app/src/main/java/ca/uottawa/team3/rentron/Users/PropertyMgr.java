@@ -11,9 +11,20 @@ public class PropertyMgr extends User {
         userData.put("avgRating", 0.0);
         userData.put("numRatings", 0);
         userData.put("numTicketsHandled", 0);
+        userData.put("numTotalPropsManaged", 0);
     }
 
     // constructors WITHOUT passwords (usually used when generating in-app user lists)
+    public PropertyMgr(String firstName, String lastName, String email, double avgRating,
+                       int numRatings, int numTicketsHandled, int numTotalPropsManaged) {
+        super(firstName, lastName, email);
+        userData.put("role", "property-manager");
+        userData.put("avgRating", avgRating);
+        userData.put("numRatings", numRatings);
+        userData.put("numTicketsHandled", numTicketsHandled);
+        userData.put("numTotalPropsManaged", numTotalPropsManaged);
+    }
+
     public PropertyMgr(String firstName, String lastName, String email, double avgRating,
                        int numRatings, int numTicketsHandled) {
         super(firstName, lastName, email);
@@ -21,6 +32,7 @@ public class PropertyMgr extends User {
         userData.put("avgRating", avgRating);
         userData.put("numRatings", numRatings);
         userData.put("numTicketsHandled", numTicketsHandled);
+        userData.put("numTotalPropsManaged", 0);
     }
 
     public PropertyMgr(String firstName, String lastName, String email) {
@@ -29,6 +41,7 @@ public class PropertyMgr extends User {
         userData.put("avgRating", 0.0);
         userData.put("numRatings", 0);
         userData.put("numTicketsHandled", 0);
+        userData.put("numTotalPropsManaged", 0);
     }
 
     public double getAvgRating() {
@@ -38,6 +51,11 @@ public class PropertyMgr extends User {
     public int getNumRatings() {
         return (int)userData.get("numRatings");
     }
+
+    public int getNumTotalPropsManaged() {
+        return (int)userData.get("numTotalPropsManaged");
+    }
+
     public int getNumTicketsHandled() {
         return (int)userData.get("numTicketsHandled");
     }

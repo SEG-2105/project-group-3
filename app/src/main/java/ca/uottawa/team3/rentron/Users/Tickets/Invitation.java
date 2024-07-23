@@ -37,7 +37,7 @@ public class Invitation implements Message {
     }
 
 
-    public String getCommission() { return (String) invitationData.get("commission"); }
+    public double getCommission() { return (double) invitationData.get("commission"); }
     public String getAccepted() { return (String) invitationData.get("accepted"); }
 
     public void setCommission(double commission) {
@@ -55,6 +55,6 @@ public class Invitation implements Message {
 
     @Override
     public boolean isValid() {
-        return !(this.getPropertyMgr().isEmpty() || this.getLandlord().isEmpty() || this.getProperty().isEmpty() || this.getCommission().isEmpty());
+        return !(this.getPropertyMgr().isEmpty() || this.getLandlord().isEmpty() || this.getProperty().isEmpty() || ((this.getCommission() < 0.0) || (this.getCommission() >= 100.0)));
     }
 }

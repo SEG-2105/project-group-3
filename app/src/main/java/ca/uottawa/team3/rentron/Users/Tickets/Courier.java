@@ -23,82 +23,76 @@ public class Courier extends Application {
         this.firestore = firestore;
     }
 
-    // send specified Request to designated firebase collections (based on type)
-    public void sendRequest(Message message) {
+    private String getCollectionType(Message.Type type) {
+        switch (type) {
+            case INVITATION:
+                return "invitations";
+            case REQUEST:
+                return "requests";
+            case TICKET:
+                return "tickets";
+            default:
+                throw new IllegalStateException("Unexpected type: " + type);
+        }
+    }
+
+    // send specified Message to designated firebase collections (based on type)
+    public void sendMessage(Message message) {
         if(!message.isValid()) {
-            Toast.makeText(context, "Specified request is invalid, make sure all fields are populated.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Specified message is invalid, make sure all fields are populated.", Toast.LENGTH_SHORT).show();
         }
         else if (doesExist(message)) {
-            Toast.makeText(context, "Request already exists.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Message already exists.", Toast.LENGTH_SHORT).show();
         }
         else {
-            // make sure request is being directed into correct collection
-            String type = "requests"; // SET TO CONSTANT AFTER CHANGED TO sendRequest(request)
+            // make sure message is directed into correct collection
+            String msgCollection = getCollectionType(message.getType());
 
-            firestore.collection(type).add(message.getData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            firestore.collection(getCollectionType(message.getType())).add(message.getData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
-                    Toast.makeText(context, "TicketHandler: Ticket successfully sent!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Courier: Message (" + msgCollection + ") successfully sent!", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(context, "TicketHandler: Ticket failed to send", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Courier: Message failed to send", Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
-    // Needs actual implementation (code from WelcomeActivity should be moved here)
-    public void acceptRequest(Request request) {
-        // first, get client's name
-        String clientEmail = request.getClient();
-        String landlordEmail = request.getLandlord();
-        CollectionReference dbClient = firestore.collection("requests");
-        //...
-
-        CollectionReference db = firestore.collection("requests");
-        Task<QuerySnapshot> query; //...
-        //... Unfinished.
-    }
-
-    // Needs actual implementation, commented out code is unfinished
+    // Untested
     private boolean doesExist(Message message) {
-//        String type = getCollectionType(request);
-//        CollectionReference db = firestore.collection(type);
-//        Task<QuerySnapshot> query;
-//        switch (type) {
-//            case "invitations":
-//                query = db.whereEqualTo("idClient", request.getClient()).whereEqualTo("idLandlord", request.getLandlord())
-//                        .whereEqualTo("property", request.getProperty()).whereEqualTo("commission", (Invitation)request.getCommission()).get();
-//                break;
-//            case "tickets":
-//                query = db.whereEqualTo("idClient", request.getClient()).whereEqualTo("idLandlord", request.getLandlord())
-//                        .whereEqualTo("property", request.getProperty()).get();
-//                break;
-//            case "requests":
-//                query = db.whereEqualTo("idClient", request.getClient()).whereEqualTo("idLandlord", request.getLandlord())
-//                        .whereEqualTo("property", request.getProperty()).get();
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + type);
-//        }
-//        while(!query.isComplete()); // hacky way to wrangle async. Firebase methods, should be changed
-//        if (query.isSuccessful()) {
-//            if (!query.getResult().isEmpty()) {
-//                return true;
-//            }
-//        }
-        return false;
-    }
-
-    private String getCollectionType(Message message) {
-        if (message instanceof Invitation) {
-            return "invitations";
-        } else if (message instanceof Ticket) {
-            return "tickets";
-        } else {
-            return "requests";
+        String msgCollection = getCollectionType(message.getType());
+        Task<QuerySnapshot> query;
+        switch (msgCollection) {
+            case "invitations":
+                query = firestore.collection(msgCollection).whereEqualTo("property", message.getData().get("property"))
+                        .whereEqualTo("idLandlord", message.getData().get("idLandlord"))
+                        .whereEqualTo("idPropertyMgr", message.getData().get("idPropertyMgr")).get();
+                break;
+            case "requests":
+                query = firestore.collection(msgCollection).whereEqualTo("property", message.getData().get("property"))
+                        .whereEqualTo("idClient", message.getData().get("idClient"))
+                        .whereEqualTo("idLandlord", message.getData().get("idLandlord"))
+                        .whereEqualTo("rejected", message.getData().get("rejected")).get();
+                break;
+            case "tickets":
+                query = firestore.collection(msgCollection).whereEqualTo("property", message.getData().get("property"))
+                        .whereEqualTo("idClient", message.getData().get("idClient"))
+                        .whereEqualTo("idPropertyMgr", message.getData().get("idPropertyMgr"))
+                        .whereEqualTo("message", message.getData().get("message")).get();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + msgCollection);
         }
+        while(!query.isComplete()); // hacky way to wrangle async. Firebase methods, should be changed
+        if (query.isSuccessful()) {
+            if (!query.getResult().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

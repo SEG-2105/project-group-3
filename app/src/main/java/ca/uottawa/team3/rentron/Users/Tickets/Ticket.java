@@ -42,6 +42,11 @@ public class Ticket implements Message {
     }
 
     @Override
+    public Type getType() {
+        return Type.TICKET;
+    }
+
+    @Override
     public boolean isValid() {
         return !(this.getClient().isEmpty() || this.getPropertyMgr().isEmpty() || this.getProperty().isEmpty() || this.getText().isEmpty());
     }

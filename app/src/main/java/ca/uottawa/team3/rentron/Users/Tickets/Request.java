@@ -15,7 +15,12 @@ public class Request implements Message {
         this.requestData.put("rejected", false);
     }
 
-    public Request() { // do nothing
+    public Request(String idClient, String idLandlord, String property, boolean rejected) {
+        requestData = new HashMap<>();
+        this.requestData.put("idClient", idClient);
+        this.requestData.put("idLandlord", idLandlord);
+        this.requestData.put("property", property);
+        this.requestData.put("rejected", rejected);
     }
 
     public String getClient() {
@@ -34,6 +39,11 @@ public class Request implements Message {
     @Override
     public Map<String, Object> getData() {
         return requestData;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.REQUEST;
     }
 
     @Override

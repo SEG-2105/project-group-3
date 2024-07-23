@@ -49,6 +49,11 @@ public class Invitation implements Message {
     }
 
     @Override
+    public Type getType() {
+        return Type.INVITATION;
+    }
+
+    @Override
     public boolean isValid() {
         return !(this.getPropertyMgr().isEmpty() || this.getLandlord().isEmpty() || this.getProperty().isEmpty() || this.getCommission().isEmpty());
     }

@@ -220,6 +220,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         selectClient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Replace this with dialog box confirming whether Landlord wants to unassign tenant
                 if (selectClient.getText().toString().isEmpty()) {
                     selectClient.setText("Example Client");
                 } else {

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +44,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
+import ca.uottawa.team3.rentron.Users.PropertyMgr;
 import ca.uottawa.team3.rentron.Users.Tickets.Courier;
+import ca.uottawa.team3.rentron.Users.Tickets.Message;
 import ca.uottawa.team3.rentron.Users.Tickets.Request;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -74,7 +77,6 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         role = activeRole;
         email = activeEmail;
-
 
         if (activeRole.equals("landlord")) {
             setContentView(R.layout.activity_welcome_landlord);
@@ -125,7 +127,15 @@ public class WelcomeActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
                 }
             });
+
+            requestsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showClientRequestsDialog();
+                }
+            });
         } else if (activeRole.equals("property-manager")) {
+            // TODO
             setContentView(R.layout.activity_welcome_manager);
         } else {
             setContentView(R.layout.activity_welcome);
@@ -282,6 +292,50 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void showClientRequestsDialog() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.layout_request_status_dialog, null);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setView(dialogView);
+        final ListView activeRequestsListView = dialogView.findViewById(R.id.activeRequestsListView);
+        final ListView rejectedRequestsListView = dialogView.findViewById(R.id.rejectedRequestsListView);
+
+        List<Request> active = new ArrayList<>();
+        List<Request> rejected = new ArrayList<>();
+
+        db.collection("requests").whereEqualTo("idClient", email).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Request request = new Request(((Boolean) document.get("rejected")) ? "REJECTED":"ACTIVE", (String) document.get("idLandlord"),
+                                        (String) document.get("property"),(Boolean) document.get("rejected"));
+                                if (request.getRejected()) {
+                                    rejected.add(request);
+                                } else {
+                                    active.add(request);
+                                }
+                                RequestListAdapter rejectedRequestListAdapter = new RequestListAdapter(WelcomeActivity.this, rejected);
+                                RequestListAdapter activeRequestListAdapter = new RequestListAdapter(WelcomeActivity.this, active);
+
+                                activeRequestsListView.setAdapter(activeRequestListAdapter);
+                                rejectedRequestsListView.setAdapter(rejectedRequestListAdapter);
+                            }
+                        } else {
+                            Log.d("showClientRequestsDialog:", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        dialogBuilder.setTitle("Requests:").setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).create().show();
     }
 
     // disable animations when leaving activity (intended for when Back button is pressed)

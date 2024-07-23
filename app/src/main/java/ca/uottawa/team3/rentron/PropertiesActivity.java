@@ -140,6 +140,7 @@ public class PropertiesActivity extends AppCompatActivity {
 
         if (role.equals("landlord")) {
             btnProperty.setVisibility(View.VISIBLE);
+            btnSearch.setVisibility(View.GONE);
         } else if (role.equals("client")) {
             btnSearch.setVisibility(View.VISIBLE);
         }

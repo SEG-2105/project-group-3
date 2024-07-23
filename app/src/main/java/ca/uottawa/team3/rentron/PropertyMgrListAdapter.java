@@ -28,9 +28,11 @@ public class PropertyMgrListAdapter extends ArrayAdapter<PropertyMgr>  {
         View listViewItem = inflater.inflate(R.layout.layout_propertymgr_item, null, true);
 
         TextView name = listViewItem.findViewById(R.id.textViewMgrName);
+        TextView avgRating = listViewItem.findViewById(R.id.textViewMgrAvgRating);
 
         PropertyMgr propertyMgr = propertyMgrs.get(position);
         name.setText(propertyMgr.getFirstName() + " " + propertyMgr.getLastName());
+        avgRating.setText("Average rating: " + propertyMgr.getAvgRating() + "/5");
         //Toast.makeText(context, "Instantiated mgr list!!", Toast.LENGTH_SHORT).show();
         return listViewItem;
     }

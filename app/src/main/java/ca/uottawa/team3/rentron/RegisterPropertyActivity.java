@@ -3,7 +3,6 @@ package ca.uottawa.team3.rentron;
 import ca.uottawa.team3.rentron.Properties.Property;
 import ca.uottawa.team3.rentron.Properties.PropertyCreator;
 import ca.uottawa.team3.rentron.Users.*;
-import ca.uottawa.team3.rentron.Users.Invitations.InvitationHandler;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -42,8 +43,9 @@ import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
 import ca.uottawa.team3.rentron.Properties.PropertyCreator;
-import ca.uottawa.team3.rentron.Users.Invitations.InvitationHandler;
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
+import ca.uottawa.team3.rentron.Users.Tickets.Courier;
+import ca.uottawa.team3.rentron.Users.Tickets.Request;
 
 public class EditPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText
@@ -217,14 +219,26 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             }
         });
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         selectClient.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                // Replace this with dialog box confirming whether Landlord wants to unassign tenant
-                if (selectClient.getText().toString().isEmpty()) {
-                    selectClient.setText("Example Client");
-                } else {
-                    selectClient.setText("");
+                if (!selectClient.getText().toString().isEmpty()) {
+                    builder.setMessage("Are you sure you want to unassign the tenant from this property??")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    selectClient.setText("");
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
                 }
             }
         });
@@ -232,7 +246,11 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
         selectMgr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPropertyMgrDialog(firestore);
+                Intent intent = new Intent(getApplicationContext(), SelectPropertyMgrActivity.class);
+                intent.putExtra("isOccupied", !selectClient.getText().toString().isEmpty());
+                startActivityForResult (intent,0);
+                finish();
+                //showPropertyMgrDialog(firestore);
             }
         });
 
@@ -330,10 +348,10 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
                     updateDoc(address, type, unit, floor, numRoom, numBathroom, numFloor, area, laundry, numParkingSpot, rent,
                             mgr, client, heating, hydro, water);
 
-                    // invitation logic for now
-                    PropertyMgr manager = new PropertyMgr("", "", mgr); // create blank mgr to simulate invitation system... will be expanded upon
-                    InvitationHandler inviteHandler = new InvitationHandler(propertyDocId, manager, landlordEmail, commission);
-                    inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
+//                    // invitation logic for now
+//                    PropertyMgr manager = new PropertyMgr("", "", mgr); // create blank mgr to simulate invitation system... will be expanded upon
+//                    InvitationHandler inviteHandler = new InvitationHandler(propertyDocId, manager, landlordEmail, commission);
+//                    inviteHandler.sendInviteToManager(); // dummy code, will be expanded on
 
                 }
             }

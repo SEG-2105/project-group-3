@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/red"
-            android:text="Unassign Manager"
+            android:text="Unassign Current Manager"
             android:visibility="gone" />
 
         <ListView

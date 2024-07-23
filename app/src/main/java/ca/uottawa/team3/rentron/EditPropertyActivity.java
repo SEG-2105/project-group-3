@@ -248,6 +248,7 @@ public class EditPropertyActivity extends AppCompatActivity implements AdapterVi
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SelectPropertyMgrActivity.class);
                 intent.putExtra("isOccupied", !selectClient.getText().toString().isEmpty());
+                intent.putExtra("property", getIntent().getStringExtra("property"));
                 startActivityForResult (intent,0);
                 finish();
                 //showPropertyMgrDialog(firestore);

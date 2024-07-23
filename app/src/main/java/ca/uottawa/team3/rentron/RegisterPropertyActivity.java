@@ -64,9 +64,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
     private TextView propertyFloorLabel, propertyUnitLabel, propertyNumFloorsLabel;
 
 
-    Button selectMgr, register;
+    Button register;
     FirebaseFirestore firestore;
-    List<PropertyMgr> propertyMgrList;
     PropertyMgr propertyMgrToAssign; // the property manager that will be assigned to this property (if applicable.)
     ArrayAdapter<CharSequence> propertyTypeAdapter, propertyLaundryAdapter;
     double commission;
@@ -93,7 +92,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
         propertyType = findViewById(R.id.propertyType);
         propertyLaundry = findViewById(R.id.propertyLaundry);
 
-        selectMgr = (Button)findViewById(R.id.propertyManager);
         register = (Button)findViewById(R.id.btnRegisterProperty);
 
         propertyFloorLabel = findViewById(R.id.propertyFloorLabel);
@@ -146,12 +144,6 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
 
         firestore = FirebaseFirestore.getInstance();
 
-        selectMgr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPropertyMgrDialog(firestore);
-            }
-        });
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,8 +176,8 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                 }
 
                 String landlord = activeEmail;  // Replace with actual landlord value
-                String manager = selectMgr.getText().toString();
-                double commission = 0; // 0 as default value (this only matters if an invite is sent upon registration)
+                String manager = "";
+                //double commission = 0; // 0 as default value (this only matters if an invite is sent upon registration)
                 String client = ""; // blank for now, since client booking comes later
 
 
@@ -359,7 +351,7 @@ public class RegisterPropertyActivity extends AppCompatActivity implements Adapt
                     }
                     else {
                         propertyMgrToAssign = propertyMgrList.get(i);
-                        selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
+                        //selectMgr.setText(propertyMgrToAssign.getFirstName() + " " + propertyMgrToAssign.getLastName());
                         b.dismiss();
                     }
                 }

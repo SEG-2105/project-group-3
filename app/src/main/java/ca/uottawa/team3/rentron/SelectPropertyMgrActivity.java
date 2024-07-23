@@ -60,16 +60,8 @@ public class SelectPropertyMgrActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // the following code is to prevent ClassCastExceptions. consider changing these fields to strings?
-                                Number avgRatingNum = (Number) document.get("avgRating");
-                                Double avgRating = (avgRatingNum != null) ? avgRatingNum.doubleValue():null;
-                                Number numRatingsNum = (Number) document.get("numRatings");
-                                Integer numRatings = (numRatingsNum != null) ? numRatingsNum.intValue() : null;
-                                Number numTicketsHandledNum = (Number) document.get("numTicketsHandled");
-                                Integer numTicketsHandled = (numTicketsHandledNum != null) ? numTicketsHandledNum.intValue() : null;
-
                                 PropertyMgr propertyMgr = new PropertyMgr((String) document.get("firstname"), (String) document.get("lastname"),
-                                        (String) document.get("email"), avgRating, numRatings, numTicketsHandled);
+                                        (String) document.get("email"), ((Long) document.get("avgRating")).doubleValue(), ((Long) document.get("numRatings")).intValue(), ((Long) document.get("numTicketsHandled")).intValue());
                                 propertyMgrList.add(propertyMgr);
                             }
                             PropertyMgrListAdapter mgrsAdapter = new PropertyMgrListAdapter(SelectPropertyMgrActivity.this, propertyMgrList);

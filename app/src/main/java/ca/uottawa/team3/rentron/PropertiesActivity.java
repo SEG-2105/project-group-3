@@ -74,7 +74,7 @@ public class PropertiesActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_properties);
         properties = new ArrayList<Property>();
-        Toast.makeText(getApplicationContext(), "Properties list created", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "Properties list created", Toast.LENGTH_SHORT).show();
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);

@@ -2,9 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/properties"
+        android:icon="@android:drawable/ic_dialog_map"
         android:title="Properties" />
     <item
         android:id="@+id/welcome"
+        android:icon="@android:drawable/ic_dialog_info"
         android:title="Welcome" />
 
 </menu>

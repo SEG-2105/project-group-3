@@ -45,9 +45,9 @@ public class PropertyMgr extends User {
     }
 
     public double getAvgRating() {
-        Long roundedAvg = ((Math.round(100 * (double) this.userData.get("avgRating")))/100);
-        return roundedAvg.doubleValue();
+        return ((double) Math.round(100 * (double) this.userData.get("avgRating")) / 100.0);
     }
+
     public int getNumRatings() {
         return (int)userData.get("numRatings");
     }

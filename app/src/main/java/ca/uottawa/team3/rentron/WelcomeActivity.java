@@ -46,6 +46,7 @@ import java.util.List;
 import ca.uottawa.team3.rentron.Properties.Property;
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
 import ca.uottawa.team3.rentron.Users.Tickets.Courier;
+import ca.uottawa.team3.rentron.Users.Tickets.Invitation;
 import ca.uottawa.team3.rentron.Users.Tickets.Message;
 import ca.uottawa.team3.rentron.Users.Tickets.Request;
 
@@ -55,6 +56,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private List<Request> activeRequests = new ArrayList<>();
     private List<Request> rejectedRequests = new ArrayList<>();
     private List<Property> tenantProperties = new ArrayList<>();
+    private List<Invitation> activeInvitations = new ArrayList<>();
     private ListView activeApplications, rejectedApplications, tenantPropertiesView;
     //private RequestListAdapter adapter; // used when refreshing list
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -135,7 +137,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             });
         } else if (activeRole.equals("property-manager")) {
-            // TODO
             setContentView(R.layout.activity_welcome_manager);
         } else {
             setContentView(R.layout.activity_welcome);
@@ -291,6 +292,24 @@ public class WelcomeActivity extends AppCompatActivity {
                     return true;
                 }
             });
+        } else if (role.equals("property-manager")) {
+            ListView invitationsListView = findViewById(R.id.invitationsListView);
+
+            db.collection("invitations").whereEqualTo("idPropertyMgr", email)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Invitation db_invite = new Invitation((String) document.get("idLandlord"), (String) document.get("idPropertyMgr"),
+                                        (String) document.get("property"), ((Double) document.get("commission")).doubleValue(), (Boolean) document.get("accepted"));
+                                activeInvitations.add(db_invite);
+                            }
+                            InvitationListAdapter inviteListAdapter = new InvitationListAdapter(WelcomeActivity.this, activeInvitations);
+                            invitationsListView.setAdapter(inviteListAdapter);
+                        } else {
+                            Log.d("WelcomeActivity:", "Error getting invites: ", task.getException());
+                        }
+                    });
         }
     }
 

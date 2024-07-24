@@ -2,6 +2,8 @@ package ca.uottawa.team3.rentron;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -130,6 +133,7 @@ public class TicketsActivity extends AppCompatActivity {
         Button declineButton = dialogView.findViewById(R.id.button_decline);
         Button sendButton = dialogView.findViewById(R.id.button_send);
         final EditText inputMessage = dialogView.findViewById(R.id.input_message);
+        final Button btnSend = dialogView.findViewById(R.id.button_send);
 
         final AlertDialog dialog = builder.create();
         dialog.show();
@@ -146,6 +150,8 @@ public class TicketsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 inputMessage.setVisibility(View.VISIBLE);
+                btnSend.setVisibility(View.VISIBLE);
+                acceptButton.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
             }
         });
 

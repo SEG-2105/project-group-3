@@ -1,6 +1,9 @@
 package ca.uottawa.team3.rentron.Users.Tickets;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Ticket implements Message {
@@ -33,7 +36,7 @@ public class Ticket implements Message {
         this.ticketData.put("rating", "");
     }
 
-    public Ticket(String idClient, String idPropertyMgr, String property, String type, String message, int urgency, String name, int event) {
+    public Ticket(String idClient, String idPropertyMgr, String property, String type, String message, int urgency, String name, int event, String rating) {
         ticketData = new HashMap<>();
         this.ticketData.put("idClient", idClient);
         this.ticketData.put("idPropertyMgr", idPropertyMgr);
@@ -57,9 +60,8 @@ public class Ticket implements Message {
 
         // To-Do, In-progress, Rejected, Resolved
         this.ticketData.put("Status", "To-Do");
-        this.ticketData.put("rating", "");
+        this.ticketData.put("rating", rating);
     }
-
 
     public void AddMessage(String incomingMessage) {
         String oldMessage = (String)this.ticketData.get("message");
@@ -78,6 +80,8 @@ public class Ticket implements Message {
     public String getName() { return (String)this.ticketData.get("name"); }
 
     public int getEvent() { return (int)this.ticketData.get("Event"); }
+
+    public String getRating() { return (String)this.ticketData.get("rating"); }
 
     public String getPropertyMgr() { return (String)this.ticketData.get("idPropertyMgr");}
 

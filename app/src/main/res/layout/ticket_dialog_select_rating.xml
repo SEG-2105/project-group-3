@@ -11,14 +11,18 @@
         android:padding="16dp"
         tools:ignore="MissingConstraints">
 
+        <TextView
+            android:id="@+id/textTicketHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <RatingBar
             android:id="@+id/ratingBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numStars="10"
-            android:stepSize="1.0"
+            android:numStars="5"
+            android:stepSize="0.5"
             android:rating="0"
-            style="?android:attr/ratingBarStyleIndicator"
             android:layout_gravity="center_horizontal"/>
 
         <EditText
@@ -26,8 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Write your message here"
-            android:inputType="textMultiLine"
-            android:minLines="3"
+            android:inputType="text"
             android:gravity="top|start"/>
 
         <Button

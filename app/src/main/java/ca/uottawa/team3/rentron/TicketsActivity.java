@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -131,7 +132,8 @@ public class TicketsActivity extends AppCompatActivity {
                             (String)document.get("messageCreation"),
                             ((Long)document.get("urgency")).intValue(),
                             (String)document.get("name"),
-                            ((Long)document.get("Event")).intValue()
+                            ((Long)document.get("Event")).intValue(),
+                            (String)document.get("rating")
                     );
 
                     if (document.get("Status").equals("Rejected") || document.get("Status").equals("Resolved")) {
@@ -166,8 +168,20 @@ public class TicketsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 builder.setMessage(activeTickets.get(i).getText())
                         .setTitle(activeTicketsName.get(i))
-                        .create().show()
-                ;
+                        .create().show();
+            }
+        });
+
+        listViewClosedTickets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (closedTickets.get(i).getRating().isEmpty()) {
+                    ticketRatingDialog(closedTickets.get(i).getText(), closedTicketsName.get(i));
+                } else {
+                    builder.setMessage(closedTickets.get(i).getText())
+                            .setTitle(closedTicketsName.get(i))
+                            .create().show();
+                }
             }
         });
 
@@ -216,6 +230,7 @@ public class TicketsActivity extends AppCompatActivity {
                 int urgence = seekBarUrgence.getProgress() + 1;
                 String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                 message = dateTime + "\n" + message;
+                name = dateTime + " " + name;
 
                 // Save the ticket information (e.g., to a database or a list)
                 // For demonstration, we just show the information in a Toast
@@ -278,17 +293,33 @@ public class TicketsActivity extends AppCompatActivity {
         });
     }
 
-    private void ticketRatingDialog() {
+    private void ticketRatingDialog(String history, String title) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.ticket_dialog_select_rating, null);
         builder.setView(dialogView);
 
         final RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
         final EditText editTextMessage = dialogView.findViewById(R.id.editTextMessage);
+        final TextView textTicketHistory = dialogView.findViewById(R.id.textTicketHistory);
+        textTicketHistory.setText(history);
+
         Button buttonSubmit = dialogView.findViewById(R.id.buttonSubmit);
 
         final AlertDialog dialog = builder.create();
         dialog.show();
+
+//        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+//            @Override
+//            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+//                ratingBar.setRating(v);
+//            }
+//        });
+//
+//        //finding the specific RatingBar with its unique ID
+//        LayerDrawable stars=(LayerDrawable)RatingBar.getProgressDrawable();
+//
+//        //Use for changing the color of RatingBar
+//        stars.getDrawable(2).setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
 
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override

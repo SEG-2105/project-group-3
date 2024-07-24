@@ -1,10 +1,13 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -24,23 +27,49 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import ca.uottawa.team3.rentron.Users.Tickets.Courier;
 import ca.uottawa.team3.rentron.Users.Tickets.Ticket;
 
 public class TicketsActivity extends AppCompatActivity {
 
+    private SharedPreferences pref;
+    private String role, email, address,manager,client;
+    FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        db = FirebaseFirestore.getInstance();
+        pref = getSharedPreferences("activeUser", Context.MODE_PRIVATE);
+        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
+        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);;
+
+        String activeEmail = "";
+        String activeRole = "";
+        try {
+            activeEmail = new String(active, "UTF-8");
+            activeRole = new String(active1, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        role = activeRole;
+        email = activeEmail;
+
         setContentView(R.layout.activity_tickets);
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
-        String address = getIntent().getStringExtra("address");
+        address = getIntent().getStringExtra("address");
+        if (role.equals("client")) {
+            manager = getIntent().getStringExtra("manager");
+        }
         getSupportActionBar().setTitle(address);
 
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -108,14 +137,15 @@ public class TicketsActivity extends AppCompatActivity {
                 String message = editTextMessage.getText().toString();
                 int urgence = seekBarUrgence.getProgress() + 1;
                 String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-
+                message = dateTime+"\n"+message;
                 // Save the ticket information (e.g., to a database or a list)
                 // For demonstration, we just show the information in a Toast
                 // You can replace this part with your own implementation
 
                 // below line is commented to pass compilation
-                //Ticket ticket = new Ticket(idClient, idPropertyMgr, property, type, message, urgence);
-
+                Ticket ticket = new Ticket(email, manager, address, type, message, urgence);
+                Courier courier = new Courier(getApplicationContext(), db);
+                courier.sendMessage(ticket);
                 dialog.dismiss();
             }
         });

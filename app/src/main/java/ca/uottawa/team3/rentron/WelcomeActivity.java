@@ -55,9 +55,15 @@ public class WelcomeActivity extends AppCompatActivity {
     private String firstName, lastName, role, email;
     private List<Request> activeRequests = new ArrayList<>();
     private List<Request> rejectedRequests = new ArrayList<>();
+
     private List<Property> tenantProperties = new ArrayList<>();
+
     private List<Invitation> activeInvitations = new ArrayList<>();
-    private ListView activeApplications, rejectedApplications, tenantPropertiesView;
+
+    private List<Property> activelyManagedProps = new ArrayList<>();
+
+    private List<Property> formerlyManagedProps = new ArrayList<>();
+    private ListView activeApplications, rejectedApplications, tenantPropertiesView, invitationsListView;
     //private RequestListAdapter adapter; // used when refreshing list
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -138,6 +144,7 @@ public class WelcomeActivity extends AppCompatActivity {
             });
         } else if (activeRole.equals("property-manager")) {
             setContentView(R.layout.activity_welcome_manager);
+            invitationsListView = findViewById(R.id.invitationsListView);
         } else {
             setContentView(R.layout.activity_welcome);
 
@@ -293,8 +300,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             });
         } else if (role.equals("property-manager")) {
-            ListView invitationsListView = findViewById(R.id.invitationsListView);
-
             db.collection("invitations").whereEqualTo("idPropertyMgr", email)
                     .get()
                     .addOnCompleteListener(task -> {
@@ -310,6 +315,133 @@ public class WelcomeActivity extends AppCompatActivity {
                             Log.d("WelcomeActivity:", "Error getting invites: ", task.getException());
                         }
                     });
+
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+            invitationsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Invitation invite = activeInvitations.get(position);
+                    dialogBuilder.setTitle(invite.getProperty()).setMessage("Are you sure you would like to accept (or decline) this invitation?\nCommission %: " + invite.getCommission())
+                            .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // first, update property document
+                                    db.collection("properties").whereEqualTo("address", invite.getProperty())
+                                            .get()
+                                            .addOnCompleteListener(task -> {
+                                               if (task.isSuccessful()) {
+                                                   DocumentSnapshot document = task.getResult().getDocuments().get(0); // we get the first doc, assuming addresses are unique
+                                                   DocumentReference reference = document.getReference();
+                                                   reference.update("manager",invite.getPropertyMgr());
+
+                                                   Toast.makeText(getApplicationContext(), "Manager assigned.", Toast.LENGTH_SHORT).show();
+                                               } else {
+                                                   Toast.makeText(getApplicationContext(), "Unable to find property document.", Toast.LENGTH_SHORT).show();
+                                               }
+                                            });
+                                    // after, update propertymgr doc to reflect new managed property
+                                    db.collection("users").whereEqualTo("email", invite.getPropertyMgr())
+                                                    .get()
+                                                    .addOnCompleteListener(task -> {
+                                                       if (task.isSuccessful()) {
+                                                           DocumentSnapshot doc = task.getResult().getDocuments().get(0);
+                                                           DocumentReference ref = doc.getReference();
+                                                           String allProperties = doc.get("allProperties", String.class);
+                                                           if (allProperties == null || allProperties.isEmpty()) {
+                                                               ref.update("allProperties", invite.getProperty()+";");
+                                                               ref.update("numTotalPropsManaged", 1);
+                                                           } else {
+                                                               boolean canAdd = true;
+                                                               for (String property : allProperties.split(";")) {
+                                                                   if ((property.equals(invite.getProperty()))) {
+                                                                       canAdd = false;
+                                                                       break;
+                                                                   }
+                                                               }
+                                                               if (canAdd) {
+                                                                   ref.update("allProperties", allProperties+invite.getProperty()+";");
+                                                                   ref.update("numTotalPropsManaged", doc.get("numTotalPropsManaged", Integer.class)+1);
+                                                               }
+                                                           }
+                                                       }
+                                                    });
+                                    // then, remove all invitations connected to this property
+                                    db.collection("invitations").whereEqualTo("property", invite.getProperty())
+                                            .get()
+                                            .addOnCompleteListener(task -> {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                        DocumentReference ref = doc.getReference();
+                                                        db.collection("invitations").document(ref.getId())
+                                                                .delete()
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void unused) {
+                                                                        Log.d("InvitationAccept:", "Invite successfully deleted");
+                                                                    }
+                                                                })
+                                                                .addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Log.d("InvitationAccept:", "Error deleting document");
+                                                                    }
+                                                                });
+                                                    }
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Unable to find outstanding invitations.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                            }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    db.collection("invitations").whereEqualTo("property", invite.getProperty())
+                                            .whereEqualTo("idLandlord", invite.getLandlord())
+                                            .whereEqualTo("idPropertyMgr", invite.getPropertyMgr())
+                                            .whereEqualTo("commission", invite.getCommission())
+                                            .get()
+                                            .addOnCompleteListener(task -> {
+                                               if (task.isSuccessful()) {
+                                                   for (QueryDocumentSnapshot doc : task.getResult()) {
+                                                       DocumentReference ref = doc.getReference();
+                                                       db.collection("invitations").document(ref.getId())
+                                                               .delete()
+                                                               .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                   @Override
+                                                                   public void onSuccess(Void unused) {
+                                                                       Log.d("InvitationReject:", "Invite successfully deleted");
+                                                                   }
+                                                               })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.d("InvitationReject:", "Error deleting document");
+                                                                   }
+                                                               });
+                                                   }
+                                               } else {
+                                                   Toast.makeText(getApplicationContext(), "Unable to find invite to reject.", Toast.LENGTH_SHORT).show();
+                                               }
+                                            });
+                                }
+                            })
+                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                // TODO: List refresh bug when intent set to WelcomeActivity
+                                Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
+                                startActivityForResult(intent, 0);
+                                overridePendingTransition(0,0);
+                        }
+                    }).create().show();
+                }
+            });
         }
     }
 
@@ -382,16 +514,15 @@ public class WelcomeActivity extends AppCompatActivity {
     private void createApplicationDialogBox() {
         //Box that appears for landlord when clicking on a request
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        //Viewing full details of a property only; available to client
+
         activeApplications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ArrayList<Request> request = new ArrayList<>();
                 request.add(activeRequests.get(position));
                 Request req = activeRequests.get(position);
-                RequestListAdapter dialogView = new RequestListAdapter(WelcomeActivity.this, request);
-                dialogBuilder.setAdapter(dialogView, null)
-                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                //RequestListAdapter dialogView = new RequestListAdapter(WelcomeActivity.this, request);
+                dialogBuilder.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -531,12 +662,13 @@ public class WelcomeActivity extends AppCompatActivity {
                                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                     @Override
                                     public void onDismiss(DialogInterface dialog) {
+                                        // TODO: List refresh bug when intent set to WelcomeActivity
                                         Intent intent = new Intent(getApplicationContext(), PropertiesActivity.class);
                                         startActivityForResult(intent, 0);
                                         overridePendingTransition(0,0);
                                     }
                                 })
-                        .setTitle(activeRequests.get(position).getProperty()).create().show();
+                        .setTitle(activeRequests.get(position).getProperty()).setMessage(req.getClient()).create().show();
             }
         });
 

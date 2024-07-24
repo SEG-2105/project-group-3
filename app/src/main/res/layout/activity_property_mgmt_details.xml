@@ -40,6 +40,14 @@
             android:textStyle="bold"/>
 
         <TextView
+            android:id="@+id/propertyLandlord"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="22sp"
+            android:text="Landlord: [name]"
+            android:textStyle="bold"/>
+
+        <TextView
             android:id="@+id/propertyTenant"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

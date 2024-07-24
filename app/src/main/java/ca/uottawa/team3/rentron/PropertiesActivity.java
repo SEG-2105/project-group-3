@@ -159,8 +159,20 @@ public class PropertiesActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getApplicationContext(), PropertyManagementDetailsActivity.class);
                     intent.putExtra("property", currentProperties.get(position).getAddress());
-                    // ...
-                    // add extra fields as necessary ...
+                    intent.putExtra("type", currentProperties.get(position).getType());
+                    intent.putExtra("landlord", currentProperties.get(position).getLandlord());
+                    intent.putExtra("tenant", currentProperties.get(position).getClient());
+                    intent.putExtra("rooms", currentProperties.get(position).getNumRoom());
+                    intent.putExtra("bathrooms", currentProperties.get(position).getNumBathroom());
+                    intent.putExtra("laundry", currentProperties.get(position).getLaundry());
+                    intent.putExtra("parkingSpots", currentProperties.get(position).getNumParkingSpot());
+                    intent.putExtra("numOfFloors", currentProperties.get(position).getNumFloor());
+                    intent.putExtra("floorNum", currentProperties.get(position).getFloor());
+                    intent.putExtra("unit", currentProperties.get(position).getUnit());
+                    intent.putExtra("rent", currentProperties.get(position).getRent());
+                    intent.putExtra("hydro", currentProperties.get(position).getHydro());
+                    intent.putExtra("heating", currentProperties.get(position).getHeating());
+                    intent.putExtra("water", currentProperties.get(position).getWater());
                     startActivityForResult(intent, 0);
                     overridePendingTransition(0,0);
                 }
@@ -185,7 +197,7 @@ public class PropertiesActivity extends AppCompatActivity {
                                     }
                                     //if role is client, filters properties that are managed and vacant
                                 } else if (role.equals("client")) {
-                                    if (db_property.getClient().isEmpty() && !db_property.getManager().isEmpty()) {
+                                    if (db_property.isRentable()) {
                                         properties.add(db_property);
                                     }
                                 } else if (role.equals("property-manager")) {

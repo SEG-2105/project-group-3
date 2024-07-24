@@ -78,6 +78,10 @@ public class Property {
         propertyData.put("client",client);
     }
 
+    public boolean isRentable() {
+        return (!getManager().isEmpty() && getClient().isEmpty());
+    }
+
     public String getAddress() {
         return this.propertyData.get("address").toString();
     }

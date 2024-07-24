@@ -122,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
                                         (String) document.get("numRoom"), (String) document.get("numBathroom"), (String) document.get("numFloor"), (String) document.get("area"),
                                         (String) document.get("laundry"), (String) document.get("numParkingSpot"), (String) document.get("rent"), (boolean) document.get("heating"), (boolean) document.get("hydro"), (boolean) document.get("water"),
                                         (String) document.get("landlord"), (String) document.get("manager"), (String) document.get("client"));
-                                if (isPropertyValid(db_property) && !db_property.getClient().equals(email)) // this search will NOT show already rented properties
+                                if (isPropertyValid(db_property) && db_property.isRentable()) // this search will NOT show already rented properties or properties without mgr
                                 {
                                     properties.add(db_property);
                                 }

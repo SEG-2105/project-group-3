@@ -236,7 +236,6 @@ public class TicketsActivity extends AppCompatActivity {
                 // For demonstration, we just show the information in a Toast
                 // You can replace this part with your own implementation
 
-                // below line is commented to pass compilation
                 Ticket ticket = new Ticket(email, manager, address, type, message, urgence, name);
                 Courier courier = new Courier(getApplicationContext(), db);
                 courier.sendMessage(ticket);

@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Users.Tickets.Request;
+import ca.uottawa.team3.rentron.Users.Messaging.Request;
 
 public class RequestListAdapter extends ArrayAdapter<Request> {
 

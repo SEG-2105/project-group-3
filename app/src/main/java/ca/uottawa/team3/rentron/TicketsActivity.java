@@ -4,13 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,7 +14,6 @@ import android.widget.Button;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,9 +27,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -44,8 +41,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import ca.uottawa.team3.rentron.Users.Tickets.Courier;
-import ca.uottawa.team3.rentron.Users.Tickets.Ticket;
+import ca.uottawa.team3.rentron.Users.Messaging.Courier;
+import ca.uottawa.team3.rentron.Users.Messaging.Ticket;
 
 public class TicketsActivity extends AppCompatActivity {
 
@@ -138,7 +135,7 @@ public class TicketsActivity extends AppCompatActivity {
 
                     db_ticket.setEvent(((Long)document.get("Event")).intValue());
 
-                    if (document.get("Status").equals("Closed")) {
+                    if (document.get("Status").equals("Closed") || document.get("Status").equals("Rated")) {
                         closedTickets.add(db_ticket);
                         closedTicketsName.add(db_ticket.getName());
                     } else {
@@ -178,7 +175,7 @@ public class TicketsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (closedTickets.get(i).getRating().isEmpty()) {
-                    ticketRatingDialog(closedTickets.get(i).getText(), closedTicketsName.get(i));
+                    ticketRatingDialog(closedTickets.get(i));
                 } else {
                     builder.setMessage(closedTickets.get(i).getText())
                             .setTitle(closedTicketsName.get(i))
@@ -248,7 +245,41 @@ public class TicketsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void ticketRatingDialog(String history, String title) {
+    private void updateDB(Ticket ticket) {
+        Task<QuerySnapshot> queryTickets = db.collection("tickets").whereEqualTo("name",ticket.getName())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult().getDocuments().get(0);
+                        DocumentReference ref = doc.getReference();
+                        ref.update("Event", ticket.getEvent());
+                        ref.update("Status", ticket.getStatus());
+                        ref.update("messageCreation", ticket.getText());
+                    }
+                });
+        //while(!query1.isComplete());
+        Task<QuerySnapshot> queryMgr = db.collection("users").whereEqualTo("email",ticket.getPropertyMgr())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult().getDocuments().get(0);
+                        DocumentReference ref = doc.getReference();
+                        double currAvgRating = 0.0;
+                        if (doc.get("avgRating") instanceof Long) {
+                            currAvgRating = ((Long) doc.get("avgRating")).doubleValue();
+                        } else {
+                            currAvgRating = (Double) doc.get("avgRating");
+                        }
+                        int n = ((Long) doc.get("numRatings")).intValue() + 1;
+                        // average = average + ((value - average) / (nValues + 1))
+                        double avgRating = currAvgRating + ((Double.valueOf(ticket.getRating()) - currAvgRating) / (n));
+                        ref.update("numRatings", (n));
+                        ref.update("avgRating", avgRating);
+                    }
+                });
+    }
+
+    private void ticketRatingDialog(Ticket ticket) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.ticket_dialog_select_rating, null);
         builder.setView(dialogView);
@@ -256,33 +287,24 @@ public class TicketsActivity extends AppCompatActivity {
         final RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
         final EditText editTextMessage = dialogView.findViewById(R.id.editTextMessage);
         final TextView textTicketHistory = dialogView.findViewById(R.id.textTicketHistory);
-        textTicketHistory.setText(history);
+        textTicketHistory.setText(ticket.getText());
 
         Button buttonSubmit = dialogView.findViewById(R.id.buttonSubmit);
 
         final AlertDialog dialog = builder.create();
         dialog.show();
 
-//        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-//            @Override
-//            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-//                ratingBar.setRating(v);
-//            }
-//        });
-//
-//        //finding the specific RatingBar with its unique ID
-//        LayerDrawable stars=(LayerDrawable)RatingBar.getProgressDrawable();
-//
-//        //Use for changing the color of RatingBar
-//        stars.getDrawable(2).setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
-
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 float rating = ratingBar.getRating();
+                String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                 String message = editTextMessage.getText().toString();
-
-                Toast.makeText(TicketsActivity.this, "Rating: " + rating + "\nMessage: " + message, Toast.LENGTH_LONG).show();
+                ticket.addMessage("Rated at " + dateTime + "\n" + "Client Rating " + rating + "/5" + "\n" + message);
+                ticket.setEvent(4);
+                ticket.setRating(rating);
+                //Toast.makeText(TicketsActivity.this, "Rating: " + rating + "\nMessage: " + message, Toast.LENGTH_LONG).show();
+                updateDB(ticket);
                 dialog.dismiss();
             }
         });

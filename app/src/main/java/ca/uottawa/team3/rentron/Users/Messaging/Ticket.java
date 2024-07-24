@@ -1,9 +1,6 @@
-package ca.uottawa.team3.rentron.Users.Tickets;
+package ca.uottawa.team3.rentron.Users.Messaging;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class Ticket implements Message {
@@ -114,6 +111,11 @@ public class Ticket implements Message {
     public String getStatus() { return (String) ticketData.get("Status"); }
 
     public String getRating() { return (String)this.ticketData.get("rating"); }
+
+    public void setRating(float rating) {
+        String ratingStr = String.valueOf(rating);
+        ticketData.put("rating", ratingStr);
+    }
 
     public String getPropertyMgr() { return (String)this.ticketData.get("idPropertyMgr");}
 

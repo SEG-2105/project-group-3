@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -31,8 +30,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Users.Tickets.*;
+import ca.uottawa.team3.rentron.Users.Messaging.*;
 
 public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;

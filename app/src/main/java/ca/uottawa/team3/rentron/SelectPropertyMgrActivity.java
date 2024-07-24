@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -33,8 +32,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
-import ca.uottawa.team3.rentron.Users.Tickets.Courier;
-import ca.uottawa.team3.rentron.Users.Tickets.Invitation;
+import ca.uottawa.team3.rentron.Users.Messaging.Courier;
+import ca.uottawa.team3.rentron.Users.Messaging.Invitation;
 
 public class SelectPropertyMgrActivity extends AppCompatActivity {
 

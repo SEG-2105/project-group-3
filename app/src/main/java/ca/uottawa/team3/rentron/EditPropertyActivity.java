@@ -42,10 +42,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Properties.PropertyCreator;
 import ca.uottawa.team3.rentron.Users.PropertyMgr;
-import ca.uottawa.team3.rentron.Users.Tickets.Courier;
-import ca.uottawa.team3.rentron.Users.Tickets.Request;
 
 public class EditPropertyActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText

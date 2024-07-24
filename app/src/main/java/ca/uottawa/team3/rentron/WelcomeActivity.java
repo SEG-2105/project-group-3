@@ -34,7 +34,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -44,11 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Users.PropertyMgr;
-import ca.uottawa.team3.rentron.Users.Tickets.Courier;
-import ca.uottawa.team3.rentron.Users.Tickets.Invitation;
-import ca.uottawa.team3.rentron.Users.Tickets.Message;
-import ca.uottawa.team3.rentron.Users.Tickets.Request;
+import ca.uottawa.team3.rentron.Users.Messaging.Invitation;
+import ca.uottawa.team3.rentron.Users.Messaging.Request;
 
 public class WelcomeActivity extends AppCompatActivity {
     private SharedPreferences pref;

@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,11 +24,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import ca.uottawa.team3.rentron.Users.Tickets.Ticket;
+import ca.uottawa.team3.rentron.Users.Messaging.Ticket;
 
 public class PropertyManagementTicketsActivity extends AppCompatActivity {
 
@@ -100,7 +101,7 @@ public class PropertyManagementTicketsActivity extends AppCompatActivity {
 
                             db_ticket.setEvent(((Long)document.get("Event")).intValue());
 
-                            if (document.get("Status").equals("Closed")) {
+                            if (document.get("Status").equals("Closed") || document.get("Status").equals("Rated")) {
                                 closedTickets.add(db_ticket);
                                 closedTicketsName.add(db_ticket.getName());
                             } else {
@@ -219,6 +220,15 @@ public class PropertyManagementTicketsActivity extends AppCompatActivity {
                         ref.update("Event", ticket.getEvent());
                         ref.update("Status", ticket.getStatus());
                         ref.update("messageCreation", ticket.getText());
+                    }
+                });
+        Task<QuerySnapshot> queryMgr = db.collection("users").whereEqualTo("email",ticket.getPropertyMgr())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot doc = task.getResult().getDocuments().get(0);
+                        DocumentReference ref = doc.getReference();
+                        ref.update("numTicketsHandled", ((Long) doc.get("numTicketsHandled") + 1));
                     }
                 });
         moveToDetails();

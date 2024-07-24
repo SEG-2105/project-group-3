@@ -1,4 +1,4 @@
-package ca.uottawa.team3.rentron.Users.Tickets;
+package ca.uottawa.team3.rentron.Users.Messaging;
 
 import java.util.HashMap;
 import java.util.Map;

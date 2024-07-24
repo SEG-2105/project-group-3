@@ -21,7 +21,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -29,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.uottawa.team3.rentron.Properties.Property;
-import ca.uottawa.team3.rentron.Users.Tickets.*;
+import ca.uottawa.team3.rentron.Users.Messaging.*;
 
 public class SearchActivity extends AppCompatActivity {
     List<Property> properties = new ArrayList<>();

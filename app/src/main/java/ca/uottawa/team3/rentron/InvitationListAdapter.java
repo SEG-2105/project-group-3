@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ca.uottawa.team3.rentron.Users.Tickets.Invitation;
-import ca.uottawa.team3.rentron.Users.Tickets.Request;
+import ca.uottawa.team3.rentron.Users.Messaging.Invitation;
 
 public class InvitationListAdapter extends ArrayAdapter<Invitation> {
 

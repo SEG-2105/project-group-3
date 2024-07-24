@@ -1,6 +1,5 @@
 package ca.uottawa.team3.rentron.Users.Tickets;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,9 +28,14 @@ public class Ticket implements Message {
 
         // To-Do, In-progress, Rejected, Resolved
         this.ticketData.put("Status", "To-Do");
-        this.ticketData.put("messageRejected", "");
-        this.ticketData.put("messageRating", "");
         this.ticketData.put("rating", "");
+    }
+
+    public void AddMessage(String incomingMessage) {
+        String oldMessage = (String)this.ticketData.get("message");
+        String newMessage = oldMessage + "\n" + incomingMessage;
+
+        this.ticketData.put("message", newMessage);
     }
 
     @Override

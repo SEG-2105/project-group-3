@@ -18,6 +18,12 @@
             app:navigationIcon="?attr/homeAsUpIndicator"
             android:layout_height="?attr/actionBarSize" />
 
+        <Button
+            android:id="@+id/btnCreateTicket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create New Ticket"/>
+
     </com.google.android.material.appbar.AppBarLayout>
 
 </RelativeLayout>

@@ -18,6 +18,12 @@
         <item>Landlord</item>
         <item>Property Manager</item>
     </string-array>
+    <string-array name="ticket_types">
+        <item>Maintenance</item>
+        <item>Security</item>
+        <item>Damage</item>
+        <item>Infestation</item>
+    </string-array>
     <string name="default_welcome">Welcome, [user]!</string>
     <string name="default_welcome_role">Your role is: [role]</string>
     <string name="properties">Properties:</string>

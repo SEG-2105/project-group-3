@@ -294,7 +294,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getApplicationContext(), TicketsActivity.class);
-                    intent.putExtra("address", tenantProperties.get(position).getAddress());
+                    intent.putExtra("address", tenantProperties.get(position).getAddress()).putExtra("manager",tenantProperties.get(position).getManager());
                     startActivityForResult (intent,0);
                     return true;
                 }

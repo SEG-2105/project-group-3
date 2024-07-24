@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron.Users.Tickets;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +12,11 @@ public class Ticket implements Message {
         this.ticketData.put("idClient", idClient);
         this.ticketData.put("idPropertyMgr", idPropertyMgr);
         this.ticketData.put("property", property);
+
+        // Maintenance, Security, Damage, Infestation
         this.ticketData.put("type", type);
-        this.ticketData.put("message", message);
+
+        this.ticketData.put("messageCreation", message);
         if (urgency > 5) {
             this.ticketData.put("urgency", new Integer(5));
         } else if (urgency < 1) {
@@ -20,7 +24,14 @@ public class Ticket implements Message {
         } else {
             this.ticketData.put("urgency", urgency);
         }
+
         this.ticketData.put("Event", 1);
+
+        // To-Do, In-progress, Rejected, Resolved
+        this.ticketData.put("Status", "To-Do");
+        this.ticketData.put("messageRejected", "");
+        this.ticketData.put("messageRating", "");
+        this.ticketData.put("rating", "");
     }
 
     @Override
@@ -34,7 +45,7 @@ public class Ticket implements Message {
 
     public String getProperty() { return (String)this.ticketData.get("property"); }
 
-    public String getText() { return (String) ticketData.get("text"); }
+    public String getText() { return (String) ticketData.get("messageCreation"); }
 
     public String getTicketType() { return (String) ticketData.get("type"); }
 

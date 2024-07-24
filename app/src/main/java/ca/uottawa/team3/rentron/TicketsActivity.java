@@ -1,5 +1,6 @@
 package ca.uottawa.team3.rentron;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -66,7 +67,13 @@ public class TicketsActivity extends AppCompatActivity {
     }
 
     private void openTicketDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                                    .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
         View dialogView = getLayoutInflater().inflate(R.layout.ticket_dialog_create_ticket, null);
         builder.setView(dialogView);
 

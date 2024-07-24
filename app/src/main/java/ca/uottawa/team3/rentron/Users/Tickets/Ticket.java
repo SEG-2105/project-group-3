@@ -58,16 +58,18 @@ public class Ticket implements Message {
 
         this.ticketData.put("Event", event);
 
-        // To-Do, In-progress, Rejected, Resolved
+        // TICKET STATES:
+        // To-Do (1) -> In-Progress (2) -> Closed (Resolved) (3) -> Rated (4)
+        // OR: To-Do (1) -> Closed (Rejected) (3) -> Rated (4)
         this.ticketData.put("Status", "To-Do");
         this.ticketData.put("rating", rating);
     }
 
-    public void AddMessage(String incomingMessage) {
-        String oldMessage = (String)this.ticketData.get("message");
+    public void addMessage(String incomingMessage) {
+        String oldMessage = (String)this.ticketData.get("messageCreation");
         String newMessage = oldMessage + "\n\n" + incomingMessage;
 
-        this.ticketData.put("message", newMessage);
+        this.ticketData.put("messageCreation", newMessage);
     }
 
     @Override
@@ -80,6 +82,36 @@ public class Ticket implements Message {
     public String getName() { return (String)this.ticketData.get("name"); }
 
     public int getEvent() { return (int)this.ticketData.get("Event"); }
+
+    // true if successful, false if failed
+    public boolean setEvent(int eventIndex) {
+        switch (eventIndex) {
+            case 1:
+                setStatus("To-Do");
+                ticketData.put("Event", eventIndex);
+                return true;
+            case 2:
+                setStatus("In-Progress");
+                ticketData.put("Event", eventIndex);
+                return true;
+            case 3:
+                setStatus("Closed");
+                ticketData.put("Event", eventIndex);
+                return true;
+            case 4:
+                setStatus("Rated");
+                ticketData.put("Event", eventIndex);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void setStatus(String status) {
+        this.ticketData.put("Status", status);
+    }
+
+    public String getStatus() { return (String) ticketData.get("Status"); }
 
     public String getRating() { return (String)this.ticketData.get("rating"); }
 

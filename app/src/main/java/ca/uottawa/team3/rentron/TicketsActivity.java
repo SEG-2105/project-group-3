@@ -136,7 +136,9 @@ public class TicketsActivity extends AppCompatActivity {
                             (String)document.get("rating")
                     );
 
-                    if (document.get("Status").equals("Rejected") || document.get("Status").equals("Resolved")) {
+                    db_ticket.setEvent(((Long)document.get("Event")).intValue());
+
+                    if (document.get("Status").equals("Closed")) {
                         closedTickets.add(db_ticket);
                         closedTicketsName.add(db_ticket.getName());
                     } else {
@@ -229,7 +231,7 @@ public class TicketsActivity extends AppCompatActivity {
 
                 int urgence = seekBarUrgence.getProgress() + 1;
                 String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                message = dateTime + "\n" + message;
+                message += "\n" + "Created at " + dateTime;
                 name = dateTime + " " + name;
 
                 // Save the ticket information (e.g., to a database or a list)
@@ -244,52 +246,6 @@ public class TicketsActivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
-
-    private void showCustomDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.ticket_dialog_choose_action, null);
-        builder.setView(dialogView);
-
-        // Get the dialog elements
-        Button acceptButton = dialogView.findViewById(R.id.button_accept);
-        Button declineButton = dialogView.findViewById(R.id.button_decline);
-        Button sendButton = dialogView.findViewById(R.id.button_send);
-        final EditText inputMessage = dialogView.findViewById(R.id.input_message);
-        final Button btnSend = dialogView.findViewById(R.id.button_send);
-
-        final AlertDialog dialog = builder.create();
-        dialog.show();
-
-        acceptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                // The property manager chose to accept the ticket
-            }
-        });
-
-        declineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                inputMessage.setVisibility(View.VISIBLE);
-                btnSend.setVisibility(View.VISIBLE);
-                acceptButton.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
-            }
-        });
-
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (inputMessage.getVisibility() == View.VISIBLE && !inputMessage.getText().toString().isEmpty()) {
-                    String message = inputMessage.getText().toString();
-                    dialog.dismiss();
-                    // The property manager chose to accept the ticket
-                } else {
-                    Toast.makeText(TicketsActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void ticketRatingDialog(String history, String title) {

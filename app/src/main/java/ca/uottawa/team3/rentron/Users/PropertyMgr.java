@@ -8,6 +8,7 @@ public class PropertyMgr extends User {
     public PropertyMgr(String firstName, String lastName, String email, SecretKey password, byte[] salt) {
         super(firstName, lastName, email, password, salt);
         userData.put("role", "property-manager");
+        userData.put("allProperties", "");
         userData.put("avgRating", 0.0);
         userData.put("numRatings", 0);
         userData.put("numTicketsHandled", 0);
@@ -19,6 +20,7 @@ public class PropertyMgr extends User {
                        int numRatings, int numTicketsHandled, int numTotalPropsManaged) {
         super(firstName, lastName, email);
         userData.put("role", "property-manager");
+        userData.put("allProperties", "");
         userData.put("avgRating", avgRating);
         userData.put("numRatings", numRatings);
         userData.put("numTicketsHandled", numTicketsHandled);
@@ -29,6 +31,7 @@ public class PropertyMgr extends User {
                        int numRatings, int numTicketsHandled) {
         super(firstName, lastName, email);
         userData.put("role", "property-manager");
+        userData.put("allProperties", "");
         userData.put("avgRating", avgRating);
         userData.put("numRatings", numRatings);
         userData.put("numTicketsHandled", numTicketsHandled);
@@ -38,6 +41,7 @@ public class PropertyMgr extends User {
     public PropertyMgr(String firstName, String lastName, String email) {
         super(firstName, lastName, email);
         userData.put("role", "property-manager");
+        userData.put("allProperties", "");
         userData.put("avgRating", 0.0);
         userData.put("numRatings", 0);
         userData.put("numTicketsHandled", 0);

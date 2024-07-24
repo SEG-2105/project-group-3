@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.app.AlertDialog;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -137,7 +138,7 @@ public class TicketsActivity extends AppCompatActivity {
                 String message = editTextMessage.getText().toString();
                 int urgence = seekBarUrgence.getProgress() + 1;
                 String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                message = dateTime+"\n"+message;
+                message = dateTime + "\n" + message;
                 // Save the ticket information (e.g., to a database or a list)
                 // For demonstration, we just show the information in a Toast
                 // You can replace this part with your own implementation
@@ -197,5 +198,31 @@ public class TicketsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void ticketRatingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.ticket_dialog_select_rating, null);
+        builder.setView(dialogView);
+
+        final RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
+        final EditText editTextMessage = dialogView.findViewById(R.id.editTextMessage);
+        Button buttonSubmit = dialogView.findViewById(R.id.buttonSubmit);
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        buttonSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float rating = ratingBar.getRating();
+                String message = editTextMessage.getText().toString();
+
+                Toast.makeText(TicketsActivity.this, "Rating: " + rating + "\nMessage: " + message, Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 }

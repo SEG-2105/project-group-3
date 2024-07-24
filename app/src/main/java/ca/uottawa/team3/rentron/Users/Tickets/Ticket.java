@@ -6,7 +6,7 @@ import java.util.Map;
 public class Ticket implements Message {
     private HashMap<String, Object> ticketData;
 
-    public Ticket(String idClient, String idPropertyMgr, String property, String type, String message, int urgency) {
+    public Ticket(String idClient, String idPropertyMgr, String property, String type, String message, int urgency, String name) {
         ticketData = new HashMap<>();
         this.ticketData.put("idClient", idClient);
         this.ticketData.put("idPropertyMgr", idPropertyMgr);
@@ -14,6 +14,8 @@ public class Ticket implements Message {
 
         // Maintenance, Security, Damage, Infestation
         this.ticketData.put("type", type);
+
+        this.ticketData.put("name", name);
 
         this.ticketData.put("messageCreation", message);
         if (urgency > 5) {

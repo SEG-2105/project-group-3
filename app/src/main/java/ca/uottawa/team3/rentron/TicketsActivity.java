@@ -111,6 +111,7 @@ public class TicketsActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         Spinner spinnerType = dialogView.findViewById(R.id.spinner_type);
+        EditText editTextName = dialogView.findViewById(R.id.edittext_name);
         EditText editTextMessage = dialogView.findViewById(R.id.edittext_message);
         SeekBar seekBarUrgence = dialogView.findViewById(R.id.seekbar_urgence);
         TextView textViewUrgenceValue = dialogView.findViewById(R.id.textview_urgence_value);
@@ -135,16 +136,19 @@ public class TicketsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String type = spinnerType.getSelectedItem().toString();
+                String name = editTextName.getText().toString();
                 String message = editTextMessage.getText().toString();
+
                 int urgence = seekBarUrgence.getProgress() + 1;
                 String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                 message = dateTime + "\n" + message;
+
                 // Save the ticket information (e.g., to a database or a list)
                 // For demonstration, we just show the information in a Toast
                 // You can replace this part with your own implementation
 
                 // below line is commented to pass compilation
-                Ticket ticket = new Ticket(email, manager, address, type, message, urgence);
+                Ticket ticket = new Ticket(email, manager, address, type, message, urgence, name);
                 Courier courier = new Courier(getApplicationContext(), db);
                 courier.sendMessage(ticket);
                 dialog.dismiss();

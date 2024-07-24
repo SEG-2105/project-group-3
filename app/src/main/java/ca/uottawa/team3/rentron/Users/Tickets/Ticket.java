@@ -6,13 +6,13 @@ import java.util.Map;
 public class Ticket implements Message {
     private HashMap<String, Object> ticketData;
 
-    public Ticket(String idClient, String idPropertyMgr, String property, String text, int urgency) {
+    public Ticket(String idClient, String idPropertyMgr, String property, String type, String message, int urgency) {
         ticketData = new HashMap<>();
         this.ticketData.put("idClient", idClient);
         this.ticketData.put("idPropertyMgr", idPropertyMgr);
         this.ticketData.put("property", property);
-        this.ticketData.put("type", property);
-        this.ticketData.put("message", text);
+        this.ticketData.put("type", type);
+        this.ticketData.put("message", message);
         if (urgency > 5) {
             this.ticketData.put("urgency", new Integer(5));
         } else if (urgency < 1) {
@@ -20,6 +20,7 @@ public class Ticket implements Message {
         } else {
             this.ticketData.put("urgency", urgency);
         }
+        this.ticketData.put("Event", 1);
     }
 
     @Override
@@ -27,24 +28,18 @@ public class Ticket implements Message {
         return ticketData;
     }
 
-    public String getClient() {
-        return (String)this.ticketData.get("idClient");
-    }
-    public String getPropertyMgr() {
-        return (String)this.ticketData.get("idPropertyMgr");
-    }
-    public String getProperty() {
-        return (String)this.ticketData.get("property");
-    }
+    public String getClient() { return (String)this.ticketData.get("idClient"); }
 
-    public String getText() {
-        return (String) ticketData.get("text");
-    }
+    public String getPropertyMgr() { return (String)this.ticketData.get("idPropertyMgr");}
+
+    public String getProperty() { return (String)this.ticketData.get("property"); }
+
+    public String getText() { return (String) ticketData.get("text"); }
+
+    public String getTicketType() { return (String) ticketData.get("type"); }
 
     @Override
-    public Type getType() {
-        return Type.TICKET;
-    }
+    public Type getType() { return Type.TICKET; }
 
     @Override
     public boolean isValid() {

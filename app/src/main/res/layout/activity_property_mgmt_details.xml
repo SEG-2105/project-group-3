@@ -280,7 +280,7 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         app:menu="@menu/menu_property_management" />
 

@@ -13,6 +13,12 @@
         android:theme="@style/Theme.Rentron"
         tools:targetApi="31">
         <activity
+            android:name=".PropertyManagementTicketsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PropertyManagementDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".SelectPropertyMgrActivity"
             android:exported="false" />
         <activity
@@ -23,9 +29,6 @@
             android:exported="false" />
         <activity
             android:name=".EditPropertyActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LandlordActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterPropertyActivity"

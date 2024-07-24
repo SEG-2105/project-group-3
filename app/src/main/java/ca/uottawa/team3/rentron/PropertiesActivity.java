@@ -81,12 +81,12 @@ public class PropertiesActivity extends AppCompatActivity {
         properties = new ArrayList<Property>();
         //Toast.makeText(getApplicationContext(), "Properties list created", Toast.LENGTH_SHORT).show();
 
-        Toolbar topBar = findViewById(R.id.topBar);
-        setSupportActionBar(topBar);
-
         if (role.equals("property-manager")) {
             setContentView(R.layout.activity_properties_manager);
         }
+
+        Toolbar topBar = findViewById(R.id.topBar);
+        setSupportActionBar(topBar);
 
         BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.properties);
@@ -142,17 +142,29 @@ public class PropertiesActivity extends AppCompatActivity {
         } else if (role.equals("client")) {
             btnSearch.setVisibility(View.VISIBLE);
         } else if (role.equals("property-manager")) {
-            firestore.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+            Task<QuerySnapshot> query = firestore.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot doc = task.getResult().getDocuments().get(0);
-                    allProperties = doc.get("allProperties", String.class);
+                    allProperties = task.getResult().getDocuments().get(0).get("allProperties", String.class);
                 } else {
                     Toast.makeText(getApplicationContext(), "Could not find PropertyMgr!! allProperties not initialized", Toast.LENGTH_SHORT).show();
                 }
             });
+            while(!query.isComplete()); // wait for allProperties query to finish before moving ahead
 
             listViewCurrentProperties = findViewById(R.id.listViewCurrentProperties);
             listViewFormerProperties = findViewById(R.id.listViewFormerProperties);
+
+            listViewCurrentProperties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getApplicationContext(), PropertyManagementDetailsActivity.class);
+                    intent.putExtra("property", currentProperties.get(position).getAddress());
+                    // ...
+                    // add extra fields as necessary ...
+                    startActivityForResult(intent, 0);
+                    overridePendingTransition(0,0);
+                }
+            });
         }
 
         firestore.collection("properties").get()

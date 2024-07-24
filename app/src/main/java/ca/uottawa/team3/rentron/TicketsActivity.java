@@ -103,7 +103,8 @@ public class TicketsActivity extends AppCompatActivity {
                 // For demonstration, we just show the information in a Toast
                 // You can replace this part with your own implementation
 
-                Ticket ticket = new Ticket(idClient, idPropertyMgr, property, type, message, urgence);
+                // below line is commented to pass compilation
+                //Ticket ticket = new Ticket(idClient, idPropertyMgr, property, type, message, urgence);
 
                 dialog.dismiss();
             }
@@ -149,7 +150,7 @@ public class TicketsActivity extends AppCompatActivity {
                     dialog.dismiss();
                     // The property manager chose to accept the ticket
                 } else {
-                    Toast.makeText(MainActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TicketsActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
                 }
             }
         });

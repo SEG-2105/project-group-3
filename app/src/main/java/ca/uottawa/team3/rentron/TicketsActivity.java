@@ -8,8 +8,11 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -22,23 +25,36 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.app.AlertDialog;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import ca.uottawa.team3.rentron.Users.Tickets.Courier;
 import ca.uottawa.team3.rentron.Users.Tickets.Ticket;
 
 public class TicketsActivity extends AppCompatActivity {
+
+    List<Ticket> activeTickets = new ArrayList<>();
+    List<Ticket> closedTickets = new ArrayList<>();
+
+    List<String> activeTicketsName = new ArrayList<>();
+    List<String> closedTicketsName = new ArrayList<>();
+
+    ListView listViewActiveTickets, listViewClosedTickets;
 
     private SharedPreferences pref;
     private String role, email, address,manager,client;
@@ -97,6 +113,64 @@ public class TicketsActivity extends AppCompatActivity {
         });
 
         // TODO: The ticket_dialog_choose_action dialog does not yet show up, but functionality is almost done
+
+        listViewActiveTickets = findViewById(R.id.listViewActiveTickets);
+        listViewClosedTickets = findViewById(R.id.listViewClosedTickets);
+
+        db.collection("tickets")
+                .whereEqualTo("idClient", email)
+                .whereEqualTo("property", address)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document: task.getResult()) {
+                    Ticket db_ticket = new Ticket(
+                            (String)document.get("idClient"),
+                            (String)document.get("idPropertyMgr"),
+                            (String)document.get("property"),
+                            (String)document.get("type"),
+                            (String)document.get("messageCreation"),
+                            ((Long)document.get("urgency")).intValue(),
+                            (String)document.get("name"),
+                            ((Long)document.get("Event")).intValue()
+                    );
+
+                    if (document.get("Status").equals("Rejected") || document.get("Status").equals("Resolved")) {
+                        closedTickets.add(db_ticket);
+                        closedTicketsName.add(db_ticket.getName());
+                    } else {
+                        activeTickets.add(db_ticket);
+                        activeTicketsName.add(db_ticket.getName());
+                    }
+                }
+
+                ArrayAdapter<String> arrayAdapterActive = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, activeTicketsName);
+                ArrayAdapter<String> arrayAdapterClosed = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, closedTicketsName);
+
+                listViewActiveTickets.setAdapter(arrayAdapterActive);
+                listViewClosedTickets.setAdapter(arrayAdapterClosed);
+            } else {
+                Toast.makeText(getApplicationContext(), "An error has occurred.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setNeutralButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        listViewActiveTickets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                builder.setMessage(activeTickets.get(i).getText())
+                        .setTitle(activeTicketsName.get(i))
+                        .create().show()
+                ;
+            }
+        });
+
     }
 
     private void openTicketDialog() {

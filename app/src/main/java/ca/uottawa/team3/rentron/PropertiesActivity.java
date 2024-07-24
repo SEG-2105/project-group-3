@@ -31,6 +31,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -46,10 +48,13 @@ public class PropertiesActivity extends AppCompatActivity {
     private SharedPreferences pref;
     Button btnProperty, btnSearch;
     List<Property> properties = new ArrayList<>();
+    List<Property> currentProperties = new ArrayList<>();
+    List<Property> formerProperties = new ArrayList<>();
     ListView listViewProperties;
+    ListView listViewCurrentProperties, listViewFormerProperties;
     FirebaseFirestore firestore;
 
-    String role, email;
+    String role, email, allProperties;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +83,10 @@ public class PropertiesActivity extends AppCompatActivity {
 
         Toolbar topBar = findViewById(R.id.topBar);
         setSupportActionBar(topBar);
+
+        if (role.equals("property-manager")) {
+            setContentView(R.layout.activity_properties_manager);
+        }
 
         BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.properties);
@@ -115,34 +124,35 @@ public class PropertiesActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.properties);
 
         listViewProperties = findViewById(R.id.listViewProperties);
+        btnProperty = findViewById(R.id.btnViewProperty);
+        btnSearch = findViewById(R.id.btnPropertySearch);
+
         // Clear the previous list
         properties.clear();
+        currentProperties.clear();
+        formerProperties.clear();
 
         // Iterate through all the properties
         firestore = FirebaseFirestore.getInstance();
 
-        btnProperty = findViewById(R.id.btnViewProperty);
-        btnSearch = findViewById(R.id.btnPropertySearch);
-
-//        byte[] active = Base64.decode(pref.getString("active", ""), Base64.DEFAULT);
-//        byte[] active1 = Base64.decode(pref.getString("activeRole", ""), Base64.DEFAULT);
-//
-//        String activeEmail = "";
-//        String activeRole = "";
-//        try {
-//            activeEmail = new String(active, "UTF-8");
-//            activeRole = new String(active1, "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        String role = activeRole;
-//        String email = activeEmail;
 
         if (role.equals("landlord")) {
             btnProperty.setVisibility(View.VISIBLE);
             btnSearch.setVisibility(View.GONE);
         } else if (role.equals("client")) {
             btnSearch.setVisibility(View.VISIBLE);
+        } else if (role.equals("property-manager")) {
+            firestore.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult().getDocuments().get(0);
+                    allProperties = doc.get("allProperties", String.class);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Could not find PropertyMgr!! allProperties not initialized", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            listViewCurrentProperties = findViewById(R.id.listViewCurrentProperties);
+            listViewFormerProperties = findViewById(R.id.listViewFormerProperties);
         }
 
         firestore.collection("properties").get()
@@ -152,22 +162,32 @@ public class PropertiesActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d("PropertiesActivity:", document.getId() + " => " + document.get("address"));
-                                Property db_property = new Property((String)document.get("address"), (String)document.get("type"), (String)document.get("unit"), (String)document.get("floor"),
-                                        (String)document.get("numRoom"), (String)document.get("numBathroom"), (String)document.get("numFloor"), (String)document.get("area"),
-                                        (String)document.get("laundry"), (String)document.get("numParkingSpot"), (String)document.get("rent"), (boolean)document.get("heating"), (boolean)document.get("hydro"), (boolean)document.get("water"),
-                                        (String)document.get("landlord"),(String)document.get("manager"),(String)document.get("client"));
+                                Property db_property = new Property((String) document.get("address"), (String) document.get("type"), (String) document.get("unit"), (String) document.get("floor"),
+                                        (String) document.get("numRoom"), (String) document.get("numBathroom"), (String) document.get("numFloor"), (String) document.get("area"),
+                                        (String) document.get("laundry"), (String) document.get("numParkingSpot"), (String) document.get("rent"), (boolean) document.get("heating"), (boolean) document.get("hydro"), (boolean) document.get("water"),
+                                        (String) document.get("landlord"), (String) document.get("manager"), (String) document.get("client"));
                                 //if the role is landlord, filters properties that are owned by the landlord
                                 if (role.equals("landlord")) {
-                                    if (db_property.getLandlord().equals(email)){
+                                    if (db_property.getLandlord().equals(email)) {
                                         properties.add(db_property);
                                     }
-                                //if role is client, filters properties that are managed and vacant
+                                    //if role is client, filters properties that are managed and vacant
                                 } else if (role.equals("client")) {
-                                    if (db_property.getClient().isEmpty() && !db_property.getManager().isEmpty()){
+                                    if (db_property.getClient().isEmpty() && !db_property.getManager().isEmpty()) {
                                         properties.add(db_property);
+                                    }
+                                } else if (role.equals("property-manager")) {
+                                    for (String address : allProperties.split(";")) {
+                                        if (address.equals(db_property.getAddress())) {
+                                            if (email.equals(db_property.getManager())) {
+                                                currentProperties.add(db_property);
+                                            } else {
+                                                formerProperties.add(db_property);
+                                            }
+                                        }
                                     }
                                 } else {
-                                    properties.add(db_property);
+                                    properties.add(db_property); //default case, we should not be here
                                 }
 
                                 //Toast.makeText(getApplicationContext(), "Property added.", Toast.LENGTH_SHORT).show();
@@ -179,12 +199,17 @@ public class PropertiesActivity extends AppCompatActivity {
 
                                 // Attach the adapter to the list view
                                 listViewProperties.setAdapter(propertiesAdapter);
-                            } else if(role.equals("client")){
+                            } else if (role.equals("client")) {
                                 // Create the client specific adapter
                                 PropertyListClient propertiesAdapter = new PropertyListClient(PropertiesActivity.this, properties);
 
                                 // Attach the adapter to the list view
                                 listViewProperties.setAdapter(propertiesAdapter);
+                            } else if (role.equals("property-manager")) {
+                                PropertyListClient currentPropertiesAdapter = new PropertyListClient(PropertiesActivity.this, currentProperties);
+                                PropertyListClient formerPropertiesAdapter = new PropertyListClient(PropertiesActivity.this, formerProperties);
+                                listViewCurrentProperties.setAdapter(currentPropertiesAdapter);
+                                listViewFormerProperties.setAdapter(formerPropertiesAdapter);
                             } else {
                                 // Create the adapter
                                 PropertyList propertiesAdapter = new PropertyList(PropertiesActivity.this, properties);
@@ -198,31 +223,31 @@ public class PropertiesActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        // ONLY LANDLORDS SHOULD HAVE ACCESS TO THIS BUTTON
-        btnProperty.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RegisterPropertyActivity.class);
-                startActivityForResult (intent,0);
-            }
-        });
-
-        listViewProperties.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Property property = properties.get(i);
-                if (email.equals(property.getLandlord()) || email.equals(property.getManager())) {
-                    Intent intent = new Intent(getApplicationContext(), EditPropertyActivity.class);
-                    intent.putExtra("property", property.getAddress());
+        if (!role.equals("property-manager")) {
+            // ONLY LANDLORDS SHOULD HAVE ACCESS TO THIS BUTTON
+            btnProperty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), RegisterPropertyActivity.class);
                     startActivityForResult(intent, 0);
                 }
-                else {
-                    Toast.makeText(getApplicationContext(), "Can't edit this property, you do not own it.", Toast.LENGTH_SHORT).show();
+            });
+
+            listViewProperties.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Property property = properties.get(i);
+                    if (email.equals(property.getLandlord()) || email.equals(property.getManager())) {
+                        Intent intent = new Intent(getApplicationContext(), EditPropertyActivity.class);
+                        intent.putExtra("property", property.getAddress());
+                        startActivityForResult(intent, 0);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Can't edit this property, you do not own it.", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        }
         LayoutInflater inflater = getLayoutInflater();
         View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
 
@@ -239,97 +264,98 @@ public class PropertiesActivity extends AppCompatActivity {
                     property.add(properties.get(position));
                     PropertyDialogListAdapter dialogView = new PropertyDialogListAdapter(PropertiesActivity.this, property);
                     dialogBuilder.setAdapter(dialogView, null)
-                                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Property property = properties.get(position);
-                                        Request request = new Request(email, property.getLandlord(), property.getAddress());
+                            .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Property property = properties.get(position);
+                                    Request request = new Request(email, property.getLandlord(), property.getAddress());
 
-                                        Courier courier = new Courier(getApplicationContext(), firestore);
-                                        courier.sendMessage(request);
+                                    Courier courier = new Courier(getApplicationContext(), firestore);
+                                    courier.sendMessage(request);
 
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setTitle(properties.get(position).getAddress()).create().show();
+                }
+            });
+
+            btnSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
+                    EditText minFloorsText, minRoomsText, minBathroomsText, minAreaText, minParkingSpotsText,
+                            minRentText, maxRentText;
+                    CheckBox typeBasement, typeStudio, typeApartment, typeTownhouse, typeHouse,
+                            utilitiesHydro, utilitiesHeating, utilitiesWater;
+                    minFloorsText = dialogViewSearch.findViewById(R.id.propertyNumFloors);
+                    minRoomsText = dialogViewSearch.findViewById(R.id.propertyBedrooms);
+                    minBathroomsText = dialogViewSearch.findViewById(R.id.propertyBathrooms);
+                    minAreaText = dialogViewSearch.findViewById(R.id.propertyArea);
+                    minParkingSpotsText = dialogViewSearch.findViewById(R.id.propertyParking);
+                    minRentText = dialogViewSearch.findViewById(R.id.propertyMinRent);
+                    maxRentText = dialogViewSearch.findViewById(R.id.propertyMaxRent);
+                    typeBasement = dialogViewSearch.findViewById(R.id.propertyTypeBasement);
+                    typeStudio = dialogViewSearch.findViewById(R.id.propertyTypeStudio);
+                    typeApartment = dialogViewSearch.findViewById(R.id.propertyTypeApartment);
+                    typeTownhouse = dialogViewSearch.findViewById(R.id.propertyTypeTownhouse);
+                    typeHouse = dialogViewSearch.findViewById(R.id.propertyTypeHouse);
+                    utilitiesHydro = dialogViewSearch.findViewById(R.id.propertyHydro);
+                    utilitiesHeating = dialogViewSearch.findViewById(R.id.propertyHeating);
+                    utilitiesWater = dialogViewSearch.findViewById(R.id.propertyWater);
+
+                    minFloorsText.setText("0");
+                    minRoomsText.setText("0");
+                    minBathroomsText.setText("0");
+                    minAreaText.setText("0");
+                    minParkingSpotsText.setText("0");
+                    minRentText.setText("0");
+                    //maxRentText.setText("0");
+
+                    dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")
+                            .setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (areSearchFieldsValid(minRentText, maxRentText, minFloorsText, minRoomsText, minBathroomsText,
+                                            minAreaText, minParkingSpotsText)) {
+                                        Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                                        intent.putExtra("minFloors", minFloorsText.getText().toString());
+                                        intent.putExtra("minRooms", minRoomsText.getText().toString());
+                                        intent.putExtra("minBathrooms", minBathroomsText.getText().toString());
+                                        intent.putExtra("minArea", minAreaText.getText().toString());
+                                        intent.putExtra("minParkingSpots", minParkingSpotsText.getText().toString());
+                                        intent.putExtra("minRent", minRentText.getText().toString());
+                                        intent.putExtra("maxRent", maxRentText.getText().toString());
+                                        intent.putExtra("typeBasement", typeBasement.isChecked());
+                                        intent.putExtra("typeStudio", typeStudio.isChecked());
+                                        intent.putExtra("typeApartment", typeApartment.isChecked());
+                                        intent.putExtra("typeTownhouse", typeTownhouse.isChecked());
+                                        intent.putExtra("typeHouse", typeHouse.isChecked());
+                                        intent.putExtra("hydro", utilitiesHydro.isChecked());
+                                        intent.putExtra("heating", utilitiesHeating.isChecked());
+                                        intent.putExtra("water", utilitiesWater.isChecked());
+                                        intent.putExtra("email", email);
+                                        startActivityForResult(intent, 0);
+                                        dialog.dismiss();
+                                    } else {
                                         dialog.dismiss();
                                     }
-                                })
-                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setTitle(properties.get(position).getAddress()).create().show();
+                                }
+                            })
+                            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    dialogBuilderSearch.create().show();
                 }
             });
         }
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View dialogViewSearch = inflater.inflate(R.layout.layout_properties_search_dialog, null, false);
-                EditText minFloorsText, minRoomsText, minBathroomsText, minAreaText, minParkingSpotsText,
-                        minRentText, maxRentText;
-                CheckBox typeBasement, typeStudio, typeApartment, typeTownhouse, typeHouse,
-                    utilitiesHydro, utilitiesHeating, utilitiesWater;
-                minFloorsText = dialogViewSearch.findViewById(R.id.propertyNumFloors);
-                minRoomsText = dialogViewSearch.findViewById(R.id.propertyBedrooms);
-                minBathroomsText = dialogViewSearch.findViewById(R.id.propertyBathrooms);
-                minAreaText = dialogViewSearch.findViewById(R.id.propertyArea);
-                minParkingSpotsText = dialogViewSearch.findViewById(R.id.propertyParking);
-                minRentText = dialogViewSearch.findViewById(R.id.propertyMinRent);
-                maxRentText = dialogViewSearch.findViewById(R.id.propertyMaxRent);
-                typeBasement = dialogViewSearch.findViewById(R.id.propertyTypeBasement);
-                typeStudio = dialogViewSearch.findViewById(R.id.propertyTypeStudio);
-                typeApartment = dialogViewSearch.findViewById(R.id.propertyTypeApartment);
-                typeTownhouse = dialogViewSearch.findViewById(R.id.propertyTypeTownhouse);
-                typeHouse = dialogViewSearch.findViewById(R.id.propertyTypeHouse);
-                utilitiesHydro = dialogViewSearch.findViewById(R.id.propertyHydro);
-                utilitiesHeating = dialogViewSearch.findViewById(R.id.propertyHeating);
-                utilitiesWater = dialogViewSearch.findViewById(R.id.propertyWater);
-
-                minFloorsText.setText("0");
-                minRoomsText.setText("0");
-                minBathroomsText.setText("0");
-                minAreaText.setText("0");
-                minParkingSpotsText.setText("0");
-                minRentText.setText("0");
-                //maxRentText.setText("0");
-
-                dialogBuilderSearch.setView(dialogViewSearch).setTitle("Filters:")
-                        .setPositiveButton("Search", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (areSearchFieldsValid(minRentText, maxRentText, minFloorsText, minRoomsText, minBathroomsText,
-                                        minAreaText, minParkingSpotsText)) {
-                                    Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
-                                    intent.putExtra("minFloors", minFloorsText.getText().toString());
-                                    intent.putExtra("minRooms", minRoomsText.getText().toString());
-                                    intent.putExtra("minBathrooms", minBathroomsText.getText().toString());
-                                    intent.putExtra("minArea", minAreaText.getText().toString());
-                                    intent.putExtra("minParkingSpots", minParkingSpotsText.getText().toString());
-                                    intent.putExtra("minRent", minRentText.getText().toString());
-                                    intent.putExtra("maxRent", maxRentText.getText().toString());
-                                    intent.putExtra("typeBasement", typeBasement.isChecked());
-                                    intent.putExtra("typeStudio", typeStudio.isChecked());
-                                    intent.putExtra("typeApartment", typeApartment.isChecked());
-                                    intent.putExtra("typeTownhouse", typeTownhouse.isChecked());
-                                    intent.putExtra("typeHouse", typeHouse.isChecked());
-                                    intent.putExtra("hydro", utilitiesHydro.isChecked());
-                                    intent.putExtra("heating", utilitiesHeating.isChecked());
-                                    intent.putExtra("water", utilitiesWater.isChecked());
-                                    intent.putExtra("email",email);
-                                    startActivityForResult(intent, 0);
-                                    dialog.dismiss();
-                                } else {
-                                    dialog.dismiss();
-                                }
-                            }
-                        })
-                        .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                dialogBuilderSearch.create().show();
-            }
-        });
     }
 
     private void toastFromDialog(String text) {

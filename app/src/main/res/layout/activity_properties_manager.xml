@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PropertiesActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/welcomeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="75dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="115dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewCurrentProperties"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Currently Managed Properties:" />
+
+        <ListView
+            android:id="@+id/listViewCurrentProperties"
+            android:layout_width="match_parent"
+            android:layout_height="225dp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="15dp" />
+
+        <TextView
+            android:id="@+id/textViewFormerProperties"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Formerly Managed Properties:" />
+
+        <ListView
+            android:id="@+id/listViewFormerProperties"
+            android:layout_width="match_parent"
+            android:layout_height="225dp"
+            />
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/menu_navigation" />
+</RelativeLayout>

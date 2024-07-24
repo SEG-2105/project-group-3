@@ -24,6 +24,48 @@
             android:layout_height="wrap_content"
             android:text="Create New Ticket"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="75dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewActiveTickets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:text="Active Tickets:" />
+
+            <ListView
+                android:id="@+id/listViewActiveTickets"
+                android:layout_width="match_parent"
+                android:layout_height="260dp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <TextView
+                android:id="@+id/textViewClosedTickets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:text="Closed Tickets:" />
+
+            <ListView
+                android:id="@+id/listViewClosedTickets"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                />
+
+        </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
 </RelativeLayout>

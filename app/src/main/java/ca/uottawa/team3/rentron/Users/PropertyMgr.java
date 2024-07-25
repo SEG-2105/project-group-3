@@ -65,7 +65,7 @@ public class PropertyMgr extends User {
     }
 
     public boolean isValid() {
-        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || Objects.isNull(this.getPassword()) || this.getRole().equals(""));
+        return !(this.getFirstName().equals("") || this.getLastName().equals("") || this.getEmail().equals("") || this.getRole().equals(""));
     }
 
 }

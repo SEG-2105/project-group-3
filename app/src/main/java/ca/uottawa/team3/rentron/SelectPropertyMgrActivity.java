@@ -78,8 +78,15 @@ public class SelectPropertyMgrActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                double avgRating = 0.0;
+                                if (document.get("avgRating") instanceof Long) {
+                                    avgRating = ((Long) document.get("avgRating")).doubleValue();
+                                } else {
+                                    avgRating = (Double) document.get("avgRating");
+                                }
+
                                 PropertyMgr propertyMgr = new PropertyMgr((String) document.get("firstname"), (String) document.get("lastname"),
-                                        (String) document.get("email"), ((Long) document.get("avgRating")).doubleValue(), ((Long) document.get("numRatings")).intValue(), ((Long) document.get("numTicketsHandled")).intValue(),
+                                        (String) document.get("email"), avgRating, ((Long) document.get("numRatings")).intValue(), ((Long) document.get("numTicketsHandled")).intValue(),
                                         ((Long) document.get("numTotalPropsManaged")).intValue());
                                 propertyMgrList.add(propertyMgr);
                             }
